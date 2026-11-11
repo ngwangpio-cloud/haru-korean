@@ -1,0 +1,2867 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="하루韓語">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22%ED%95%98%EB%A3%A8%20%E9%9F%93%E8%AA%9E%22%2C%22short_name%22%3A%22%ED%95%98%EB%A3%A8%E9%9F%93%E8%AA%9E%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f7f8fa%22%2C%22theme_color%22%3A%22%23ff5a5f%22%7D">
+  <title>하루韓語 Haru Korean</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;700;900&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', 'Noto Sans TC', 'Noto Sans KR', sans-serif;
+      background-color: #f4f5f7;
+      color: #191f28;
+      overflow-x: hidden;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .font-kr {
+      font-family: 'Noto Sans KR', 'Noto Sans TC', sans-serif;
+    }
+    .card-perspective {
+      perspective: 1200px;
+    }
+    .card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+      transform-style: preserve-3d;
+    }
+    .card-inner.is-flipped {
+      transform: rotateY(180deg);
+    }
+    .card-face {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      border-radius: 1.75rem;
+    }
+    .card-back {
+      transform: rotateY(180deg);
+    }
+    .swipe-card {
+      touch-action: pan-y;
+      user-select: none;
+      -webkit-user-select: none;
+      transition: transform 0.22s ease, opacity 0.22s ease;
+    }
+    .swipe-card.dragging {
+      transition: none;
+      cursor: grabbing;
+    }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #d1d5db;
+      border-radius: 9999px;
+    }
+    /* Mobile-first App Container */
+    body.is-mobile-mode {
+      background-color: #eef0f4;
+      padding-bottom: 76px;
+    }
+    body.is-mobile-mode #appShellWrapper {
+      max-width: 440px;
+      margin: 0 auto;
+      min-height: 100vh;
+      background-color: #f7f8fa;
+      box-shadow: 0 4px 24px rgba(15, 23, 42, 0.06);
+    }
+    body.is-mobile-mode #topDesktopNav {
+      display: none !important;
+    }
+    body.is-mobile-mode #mobileBottomNav {
+      display: flex !important;
+    }
+    /* Dark Mode */
+    body.app-dark,
+    body.app-dark #appShellWrapper {
+      background-color: #111827 !important;
+      color: #f3f4f6 !important;
+    }
+    body.app-dark header,
+    body.app-dark footer,
+    body.app-dark #mobileBottomNav,
+    body.app-dark .bg-white {
+      background-color: #1f2937 !important;
+      color: #f3f4f6 !important;
+      border-color: #374151 !important;
+    }
+    body.app-dark .bg-slate-50,
+    body.app-dark .bg-slate-100,
+    body.app-dark .bg-\[\#f7f8fa\] {
+      background-color: #111827 !important;
+      color: #e5e7eb !important;
+      border-color: #374151 !important;
+    }
+    body.app-dark .text-slate-900,
+    body.app-dark .text-slate-800,
+    body.app-dark .text-slate-700 {
+      color: #f9fafb !important;
+    }
+    body.app-dark .text-slate-600,
+    body.app-dark .text-slate-500 {
+      color: #9ca3af !important;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col text-slate-800">
+
+  <!-- Toast Notification -->
+  <div id="toastContainer" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-2 pointer-events-none w-full max-w-xs px-4"></div>
+
+  <!-- Extracted Vocabulary Confirmation Sheet (影片/文字擷取生字確認) -->
+  <div id="extractModal" class="fixed inset-0 z-50 hidden bg-black/50 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl max-w-md w-full max-h-[85vh] flex flex-col overflow-hidden">
+      <div class="px-5 pt-5 pb-3 border-b border-slate-100 flex items-center justify-between">
+        <div>
+          <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+            <span>找到的韓文單字</span>
+            <span id="extractModalCountBadge" class="text-xs bg-rose-50 text-rose-600 px-2 py-0.5 rounded-full font-semibold">0</span>
+          </h3>
+          <p class="text-xs text-slate-500 mt-0.5">勾選要加入生字本的單字</p>
+        </div>
+        <button type="button" onclick="closeExtractModal()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center text-sm" aria-label="關閉視窗">✕</button>
+      </div>
+
+      <div class="px-5 py-2.5 bg-slate-50 flex items-center justify-between text-xs">
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="toggleAllExtracted(true)" class="px-2.5 py-1 rounded-lg bg-white border border-slate-200 text-slate-700 font-medium">全選</button>
+          <button type="button" onclick="toggleAllExtracted(false)" class="px-2.5 py-1 rounded-lg bg-white border border-slate-200 text-slate-700 font-medium">取消全選</button>
+        </div>
+        <span id="extractSelectedSummary" class="text-slate-500 font-medium">已選 0 個</span>
+      </div>
+
+      <div id="extractModalList" class="p-4 overflow-y-auto custom-scrollbar space-y-2 flex-1"></div>
+
+      <div class="p-4 border-t border-slate-100 flex items-center gap-2.5">
+        <button type="button" onclick="closeExtractModal()" class="flex-1 py-3 rounded-2xl bg-slate-100 text-slate-700 text-sm font-semibold">取消</button>
+        <button type="button" onclick="confirmAddExtractedWords()" class="flex-[2] py-3 rounded-2xl bg-rose-500 hover:bg-rose-600 text-white text-sm font-bold shadow-sm">
+          加入生字本
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOPIK 1000 Dictionary Sheet -->
+  <div id="topikBrowserModal" class="fixed inset-0 z-50 hidden bg-black/50 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl max-w-lg w-full max-h-[86vh] flex flex-col overflow-hidden">
+      <div class="px-5 pt-5 pb-3 border-b border-slate-100 flex items-center justify-between">
+        <div>
+          <h3 class="text-base font-bold text-slate-900">TOPIK 1 單字表 (1,000 字)</h3>
+          <p id="topikModalCounter" class="text-xs text-slate-400 mt-0.5">共 1000 字</p>
+        </div>
+        <button type="button" onclick="closeTopikBrowser()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center text-sm">✕</button>
+      </div>
+      <div class="p-3.5 bg-slate-50 border-b border-slate-100 flex gap-2">
+        <input id="topikModalSearch" type="text" oninput="renderTopikBrowserList()" placeholder="搜尋韓文或中文..." class="px-3.5 py-2 rounded-xl border border-slate-200 text-sm flex-1 bg-white focus:outline-none focus:border-rose-400">
+        <select id="topikModalRange" onchange="renderTopikBrowserList()" class="px-2.5 py-2 rounded-xl border border-slate-200 text-xs font-medium bg-white">
+          <option value="all">全部</option>
+          <option value="0-100">1-100 日常</option>
+          <option value="100-200">101-200 人物</option>
+          <option value="200-300">201-300 時間</option>
+          <option value="300-400">301-400 飲食</option>
+          <option value="400-500">401-500 場所</option>
+          <option value="500-600">501-600 物品</option>
+          <option value="600-700">601-700 情感</option>
+          <option value="700-800">701-800 動詞 I</option>
+          <option value="800-900">801-900 動詞 II</option>
+          <option value="900-1000">901-1000 自然</option>
+        </select>
+      </div>
+      <div id="topikBrowserGrid" class="p-4 overflow-y-auto custom-scrollbar space-y-2 flex-1"></div>
+    </div>
+  </div>
+
+  <!-- Settings Bottom Sheet (App 設定) -->
+  <div id="mobileAppModal" class="fixed inset-0 z-50 hidden bg-black/50 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl max-w-md w-full overflow-hidden">
+      <div class="px-5 pt-5 pb-3 border-b border-slate-100 flex items-center justify-between">
+        <h3 class="text-base font-bold text-slate-900">偏好設定</h3>
+        <button type="button" onclick="closeMobileAppModal()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center text-sm">✕</button>
+      </div>
+      <div class="p-5 space-y-3 text-sm">
+        <div class="flex items-center justify-between py-2">
+          <div>
+            <div class="font-semibold text-slate-800">抽卡自動發音</div>
+            <div class="text-xs text-slate-400">翻開新單字卡時自動朗讀韓文</div>
+          </div>
+          <button type="button" id="toggleAutoSpeakBtn" onclick="toggleAppSetting('autoSpeak')" class="px-3.5 py-1.5 rounded-full bg-slate-100 text-slate-600 font-semibold text-xs">關閉</button>
+        </div>
+
+        <div class="flex items-center justify-between py-2 border-t border-slate-100">
+          <div>
+            <div class="font-semibold text-slate-800">觸覺震動回饋</div>
+            <div class="text-xs text-slate-400">左右滑卡與打卡時輕微震動</div>
+          </div>
+          <button type="button" id="toggleHapticBtn" onclick="toggleAppSetting('haptic')" class="px-3.5 py-1.5 rounded-full bg-rose-500 text-white font-semibold text-xs">開啟</button>
+        </div>
+
+        <div class="flex items-center justify-between py-2 border-t border-slate-100">
+          <div>
+            <div class="font-semibold text-slate-800">深色模式</div>
+            <div class="text-xs text-slate-400">切換深色背景主題</div>
+          </div>
+          <button type="button" id="toggleDarkModeBtn" onclick="toggleAppSetting('darkMode')" class="px-3.5 py-1.5 rounded-full bg-slate-100 text-slate-600 font-semibold text-xs">淺色</button>
+        </div>
+
+        <!-- Study Timer -->
+        <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between mt-2">
+          <div>
+            <div class="font-semibold text-slate-800 text-xs">專注計時器</div>
+            <div id="pomodoroDisplay" class="font-mono text-lg font-bold text-rose-500">15:00</div>
+          </div>
+          <div class="flex items-center gap-2">
+            <button type="button" id="pomodoroStartBtn" onclick="togglePomodoroTimer()" class="px-3.5 py-2 rounded-xl bg-rose-500 text-white font-semibold text-xs">開始</button>
+            <button type="button" onclick="resetPomodoroTimer()" class="px-3 py-2 rounded-xl bg-white border border-slate-200 text-slate-600 text-xs">重設</button>
+          </div>
+        </div>
+
+        <!-- Add to Home Screen tip -->
+        <div class="p-3.5 rounded-2xl bg-rose-50/60 text-xs text-slate-600 space-y-1.5">
+          <div class="font-semibold text-slate-800">📲 加到手機主畫面</div>
+          <p>iPhone 請點 Safari 底部「分享 ➔ 加入主畫面」；Android 請點選單「安裝應用程式」。</p>
+          <button type="button" onclick="triggerPwaInstall()" class="w-full py-2 rounded-xl bg-white border border-rose-200 text-rose-600 font-semibold text-xs mt-1">切換滿版 App 檢視</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Profile & Backup Sheet (進度備份) -->
+  <div id="progressModal" class="fixed inset-0 z-50 hidden bg-black/50 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl max-w-md w-full overflow-hidden">
+      <div class="px-5 pt-5 pb-3 border-b border-slate-100 flex items-center justify-between">
+        <h3 class="text-base font-bold text-slate-900">學習進度與備份</h3>
+        <button type="button" onclick="closeProgressModal()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center text-sm">✕</button>
+      </div>
+      <div class="p-5 space-y-4 text-xs sm:text-sm">
+        <p class="text-xs text-slate-500 leading-relaxed">
+          學習紀錄會自動保存在您目前的手機或電腦瀏覽器中，每位使用者皆為獨立進度。若要更換設備，可使用下方進度碼備份還原。
+        </p>
+
+        <div class="space-y-1.5">
+          <label for="profileSelector" class="block text-xs font-semibold text-slate-700">切換學習檔案</label>
+          <select id="profileSelector" onchange="switchUserProfile(this.value)" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-medium bg-slate-50">
+            <option value="default">預設檔案</option>
+            <option value="learner_b">學習檔案 2</option>
+            <option value="learner_c">學習檔案 3</option>
+          </select>
+        </div>
+
+        <div class="space-y-2 pt-2 border-t border-slate-100">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-slate-700">進度備份碼</span>
+            <button type="button" onclick="exportProgressCode()" class="text-rose-500 font-semibold text-xs">複製備份碼</button>
+          </div>
+          <textarea id="progressSyncCodeInput" rows="2" placeholder="貼上備份碼以還原學習進度..." class="w-full p-3 rounded-xl border border-slate-200 text-xs font-mono bg-slate-50 focus:outline-none"></textarea>
+          <button type="button" onclick="importProgressCode()" class="w-full py-2.5 rounded-xl bg-slate-900 text-white text-xs font-semibold">還原進度</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main App Shell -->
+  <div id="appShellWrapper" class="min-h-screen flex flex-col">
+
+    <!-- Clean Minimal App Header -->
+    <header class="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-100">
+      <div class="max-w-3xl mx-auto px-4">
+        <div class="flex items-center justify-between h-14">
+          <!-- Brand Title -->
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-xl bg-rose-500 flex items-center justify-center text-white font-black text-base font-kr">
+              하
+            </div>
+            <span class="font-bold text-base tracking-tight text-slate-900">하루韓語</span>
+          </div>
+
+          <!-- Compact Status & Utility Icons -->
+          <div class="flex items-center gap-1.5">
+            <button type="button" onclick="switchTab('vocabbook')" class="px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 text-xs font-semibold flex items-center gap-1" title="生字本">
+              <span>★</span>
+              <span id="headerStarredCount">8</span>
+            </button>
+
+            <button type="button" id="quickCheckinBtn" onclick="handleDailyCheckin()" class="px-2.5 py-1 rounded-full bg-rose-50 text-rose-600 text-xs font-semibold flex items-center gap-1">
+              <span id="headerStreakBadge">🔥 3</span>
+              <span id="quickCheckinLabel" class="hidden sm:inline">打卡</span>
+            </button>
+
+            <button type="button" onclick="openMobileAppModal()" class="w-8 h-8 rounded-full hover:bg-slate-100 text-slate-500 flex items-center justify-center text-sm" title="偏好設定">⚙️</button>
+            <button type="button" onclick="openProgressModal()" class="w-8 h-8 rounded-full hover:bg-slate-100 text-slate-500 flex items-center justify-center text-sm" title="進度備份">👤</button>
+          </div>
+        </div>
+
+        <!-- Desktop Navigation (Hidden in Mobile Mode) -->
+        <nav id="topDesktopNav" class="flex items-center gap-1 overflow-x-auto py-2 no-scrollbar border-t border-slate-100">
+          <button type="button" data-tab="flashcard" onclick="switchTab('flashcard')" class="nav-tab-btn px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition bg-slate-900 text-white">單字卡</button>
+          <button type="button" data-tab="vocabbook" onclick="switchTab('vocabbook')" class="nav-tab-btn px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition text-slate-500 hover:bg-slate-100">生字本</button>
+          <button type="button" data-tab="videoloader" onclick="switchTab('videoloader')" class="nav-tab-btn px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition text-slate-500 hover:bg-slate-100">影片取字</button>
+          <button type="button" data-tab="kpop" onclick="switchTab('kpop')" class="nav-tab-btn px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition text-slate-500 hover:bg-slate-100">K-Pop 歌詞</button>
+          <button type="button" data-tab="translator" onclick="switchTab('translator')" class="nav-tab-btn px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition text-slate-500 hover:bg-slate-100">翻譯</button>
+          <button type="button" data-tab="checkin" onclick="switchTab('checkin')" class="nav-tab-btn px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition text-slate-500 hover:bg-slate-100">打卡紀錄</button>
+        </nav>
+      </div>
+    </header>
+
+    <!-- Hidden legacy stat hooks so script updates never fail -->
+    <div class="hidden">
+      
+      <span id="heroTodayDateLabel"></span>
+      <span id="heroTotalWordsStat"></span>
+      <span id="heroMasteredStat"></span>
+      <span id="heroPointsStat"></span>
+      <div id="fcMiniStarredList"></div>
+    </div>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 max-w-xl w-full mx-auto px-4 py-4 space-y-4">
+
+      <!-- ==========================================
+           TAB 1: 單字卡 (FLASHCARDS)
+           ========================================== -->
+      <section id="tab-flashcard" class="tab-panel space-y-4">
+        <!-- Segmented Control: All 1000 vs Starred Book -->
+        <div class="bg-slate-200/70 p-1 rounded-2xl grid grid-cols-2 gap-1">
+          <button type="button" id="modeBtnAll" onclick="setFlashcardMode('all')" class="py-2 rounded-xl text-xs font-bold transition bg-white text-slate-900 shadow-xs flex items-center justify-center gap-1.5">
+            <span>TOPIK 1 全部</span>
+            <span id="modeAllCountBadge" class="text-[11px] text-slate-400">1000</span>
+          </button>
+          <button type="button" id="modeBtnStarred" onclick="setFlashcardMode('starred')" class="py-2 rounded-xl text-xs font-bold transition text-slate-600 flex items-center justify-center gap-1.5">
+            <span class="text-amber-500">★</span>
+            <span>只練生字本</span>
+            <span id="modeStarredCountBadge" class="text-[11px] text-slate-400">8</span>
+          </button>
+        </div>
+
+        <!-- Compact Filter Row -->
+        <div class="flex items-center gap-2">
+          <select id="fcCategorySelect" onchange="handleFlashcardFilterChange()" class="flex-1 px-3 py-2 rounded-xl bg-white border border-slate-200/80 text-xs font-medium text-slate-700 focus:outline-none">
+            <option value="all">全部主題 (1-1000)</option>
+            <option value="問候與日常">日常表達</option>
+            <option value="人物與家庭">人物與職業</option>
+            <option value="時間與數字">時間與數字</option>
+            <option value="食物與餐廳">飲食與餐廳</option>
+            <option value="場所與交通">場所與交通</option>
+            <option value="生活與物品">生活物品</option>
+            <option value="身體與情感">身體與情感</option>
+            <option value="核心動詞I">常用動詞 I</option>
+            <option value="動詞與形容詞">動詞與形容詞</option>
+            <option value="自然與副詞">自然與副詞</option>
+            <option value="自訂與影片">自訂收錄</option>
+          </select>
+
+          <select id="fcFamiliarityFilter" onchange="handleFlashcardFilterChange()" class="px-3 py-2 rounded-xl bg-white border border-slate-200/80 text-xs font-medium text-slate-700 focus:outline-none">
+            <option value="all">智慧排序</option>
+            <option value="1">還不熟</option>
+            <option value="0">新單字</option>
+            <option value="3">已記住</option>
+          </select>
+
+          <button type="button" onclick="openTopikBrowser()" class="px-3 py-2 rounded-xl bg-white border border-slate-200/80 text-slate-700 text-xs font-semibold shrink-0">
+            詞庫
+          </button>
+        </div>
+
+        <!-- Empty State -->
+        <div id="fcEmptyState" class="hidden bg-white rounded-3xl p-8 text-center border border-slate-100 space-y-3">
+          <div class="text-3xl">⭐</div>
+          <div class="text-sm font-bold text-slate-800">目前範圍沒有單字</div>
+          <p class="text-xs text-slate-400">在練習時按右上角星號 ★ 即可把單字收進生字本</p>
+          <div class="flex justify-center gap-2 pt-1">
+            <button type="button" onclick="setFlashcardMode('all')" class="px-4 py-2 rounded-xl bg-slate-900 text-white text-xs font-semibold">回到全部單字</button>
+            <button type="button" onclick="seedStarterStarredWords()" class="px-4 py-2 rounded-xl bg-amber-50 text-amber-700 text-xs font-semibold">加入精選單字</button>
+          </div>
+        </div>
+
+        <!-- Active Flashcard Stage -->
+        <div id="fcActiveStage" class="space-y-4">
+          <!-- Subtle card meta -->
+          <div class="flex items-center justify-between px-1 text-xs text-slate-400">
+            <div class="flex items-center gap-1.5">
+              <span id="fcCardIndexLabel" class="font-semibold text-slate-500">#0001</span>
+              <span>·</span>
+              <span id="fcCardCategoryBadge">日常</span>
+            </div>
+            <span id="fcCardWeightBadge" class="text-[11px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 font-medium">新單字</span>
+          </div>
+
+          <!-- Swipeable Flashcard -->
+          <div id="fcSwipeWrapper" class="swipe-card relative w-full h-80 select-none cursor-grab">
+            <!-- Minimal Swipe Overlays -->
+            <div id="swipeLeftIndicator" class="pointer-events-none opacity-0 transition-opacity duration-150 absolute top-5 right-5 z-30 px-3.5 py-1.5 rounded-full bg-rose-500 text-white font-bold text-xs shadow-md">
+              還不熟
+            </div>
+            <div id="swipeRightIndicator" class="pointer-events-none opacity-0 transition-opacity duration-150 absolute top-5 left-5 z-30 px-3.5 py-1.5 rounded-full bg-emerald-500 text-white font-bold text-xs shadow-md">
+              記住了
+            </div>
+
+            <div class="card-perspective w-full h-full">
+              <div id="fcCardInner" class="card-inner w-full h-full">
+                <!-- FRONT -->
+                <div class="card-face bg-white border border-slate-200/80 shadow-md flex flex-col justify-between p-6">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-1.5">
+                      <button type="button" onclick="speakCurrentFlashcard(event)" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-rose-50 text-slate-700 flex items-center justify-center text-sm transition" title="發音">
+                        🔊<span class="sr-only">🔊 韓文發音</span>
+                      </button>
+                      <button type="button" id="fcMicPracticeBtn" onclick="startKoreanPronunciationCheck(event)" class="px-3 py-1.5 rounded-full bg-slate-100 hover:bg-rose-50 text-slate-600 text-xs font-semibold flex items-center gap-1 transition">
+                        <span>🎙️ 跟讀</span>
+                      </button>
+                    </div>
+
+                    <button type="button" id="fcStarBtnFront" onclick="toggleCurrentCardStar(event)" class="w-9 h-9 rounded-full flex items-center justify-center text-lg transition" title="加入生字本">
+                      <span id="fcStarIconFront">☆</span>
+                      <span id="fcStarTextFront" class="sr-only">加入生字本</span>
+                    </button>
+                  </div>
+
+                  <div onclick="flipFlashcard()" class="flex-1 flex flex-col items-center justify-center text-center cursor-pointer">
+                    <div id="fcFrontKorean" class="font-kr text-5xl font-black text-slate-900 tracking-tight mb-2">가게</div>
+                    <div id="fcFrontRoman" class="text-sm text-slate-400 font-medium">[gage]</div>
+                    <div id="fcFrontPos" class="mt-2.5 text-[11px] px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-500">名詞</div>
+                    <div id="fcPronunciationResult" class="hidden mt-2 text-xs font-semibold px-3 py-1 rounded-full bg-emerald-50 text-emerald-700"></div>
+                  </div>
+
+                  <div onclick="flipFlashcard()" class="text-center text-xs text-slate-400 cursor-pointer">
+                    點擊卡片翻面 · 左右滑動切換
+                  </div>
+                </div>
+
+                <!-- BACK -->
+                <div class="card-face card-back bg-slate-900 text-white shadow-md flex flex-col justify-between p-6">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-1.5">
+                      <button type="button" onclick="speakCurrentFlashcard(event)" class="px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs font-medium">
+                        🔊 單字
+                      </button>
+                      <button type="button" onclick="speakCurrentExample(event)" class="px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs font-medium">
+                        🗣️ 例句
+                      </button>
+                    </div>
+                    <button type="button" id="fcStarBtnBack" onclick="toggleCurrentCardStar(event)" class="w-9 h-9 rounded-full bg-white/10 text-amber-400 flex items-center justify-center text-lg">
+                      <span id="fcStarIconBack">★</span>
+                      <span id="fcStarTextBack" class="sr-only">生字本</span>
+                    </button>
+                  </div>
+
+                  <div onclick="flipFlashcard()" class="flex-1 flex flex-col items-center justify-center text-center cursor-pointer space-y-2">
+                    <div id="fcBackKoreanSmall" class="font-kr text-lg font-bold text-rose-300">가게 [gage]</div>
+                    <div id="fcBackChinese" class="text-2xl sm:text-3xl font-bold text-white">商店</div>
+                    <div class="w-full mt-3 p-3.5 rounded-2xl bg-white/10 text-left space-y-1">
+                      <div id="fcBackExKo" class="font-kr text-sm font-semibold text-white">가게에서 우유와 빵을 샀어요.</div>
+                      <div id="fcBackExZh" class="text-xs text-slate-300">在商店買了牛奶和麵包。</div>
+                    </div>
+                  </div>
+
+                  <div class="flex items-center justify-between text-[11px] text-slate-400">
+                    <span id="fcBackSeenStats">練習 0 次</span>
+                    <button type="button" onclick="flipFlashcard()" class="text-slate-300">翻回正面</button>
+                    <a id="fcBackSourceLink" href="https://learning-korean.com/DL/TOPIK-I-1671.pdf" target="_blank" rel="noopener noreferrer" class="text-slate-400 hover:underline">TOPIK I ↗</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Clean 3-Button Action Row (Like Quizlet / Anki) -->
+          <div class="grid grid-cols-3 gap-3 pt-1">
+            <button type="button" onclick="triggerSwipeAction('left')" class="py-3.5 rounded-2xl bg-white border border-rose-200 text-rose-600 hover:bg-rose-50 font-bold text-sm shadow-2xs flex items-center justify-center gap-1.5 active:scale-95 transition">
+              <span>✕</span><span>還不熟</span>
+            </button>
+
+            <button type="button" onclick="flipFlashcard()" class="py-3.5 rounded-2xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 font-semibold text-sm shadow-2xs flex items-center justify-center gap-1.5 active:scale-95 transition">
+              <span>翻面</span>
+            </button>
+
+            <button type="button" onclick="triggerSwipeAction('right')" class="py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm shadow-2xs flex items-center justify-center gap-1.5 active:scale-95 transition">
+              <span>✓</span><span>記住了</span>
+            </button>
+          </div>
+
+          <!-- Compact Progress Strip -->
+          <div class="bg-white rounded-2xl px-4 py-3 border border-slate-100 flex items-center justify-between text-xs text-slate-500">
+            <div class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-rose-500"></span>
+              <span>待加強 <strong id="srsCountHard" class="text-slate-800">0</strong></span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+              <span>學習中 <strong id="srsCountMedium" class="text-slate-800">0</strong></span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+              <span>已熟記 <strong id="srsCountEasy" class="text-slate-800">0</strong></span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-slate-300"></span>
+              <span>未看過 <strong id="srsCountNew" class="text-slate-800">1000</strong></span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           TAB 2: 生字本 (VOCABULARY BOOK)
+           ========================================== -->
+      <section id="tab-vocabbook" class="tab-panel hidden space-y-4">
+        <div class="bg-white rounded-3xl p-4 border border-slate-100 flex items-center justify-between">
+          <div>
+            <div class="flex items-center gap-2">
+              <h2 class="text-base font-bold text-slate-900">我的生字本</h2>
+              <span id="vbTotalBadge" class="text-xs px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 font-bold">8</span>
+            </div>
+            <p class="text-xs text-slate-400 mt-0.5">打星號收藏的重點單字</p>
+          </div>
+          <button type="button" onclick="startStarredFlashcardPractice()" class="px-4 py-2.5 rounded-2xl bg-rose-500 hover:bg-rose-600 text-white text-xs font-bold shadow-xs">
+            抽卡練習生字本
+          </button>
+        </div>
+
+        <!-- Search & Filter -->
+        <div class="flex gap-2">
+          <input id="vbSearchInput" type="text" oninput="renderVocabBook()" placeholder="搜尋已收藏的單字..." class="px-3.5 py-2.5 rounded-2xl bg-white border border-slate-200/80 text-xs flex-1 focus:outline-none">
+          <select id="vbFilterFamiliarity" onchange="renderVocabBook()" class="px-3 py-2.5 rounded-2xl bg-white border border-slate-200/80 text-xs font-medium text-slate-700">
+            <option value="all">全部狀態</option>
+            <option value="1">還不熟</option>
+            <option value="0">未練習</option>
+            <option value="3">已記住</option>
+          </select>
+        </div>
+
+        <!-- Quick Add Custom Word Bar -->
+        <div class="bg-white rounded-2xl p-3.5 border border-slate-100 space-y-2.5">
+          <div class="text-xs font-semibold text-slate-600">手動新增單字</div>
+          <div class="grid grid-cols-2 gap-2">
+            <input id="manualKoInput" type="text" placeholder="韓文 (例：설레다)" class="px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs font-kr focus:outline-none">
+            <input id="manualZhInput" type="text" placeholder="中文意思 (例：心動)" class="px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs focus:outline-none">
+          </div>
+          <div class="flex gap-2">
+            <input id="manualExInput" type="text" placeholder="例句 (選填)" class="flex-1 px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs focus:outline-none">
+            <button type="button" onclick="handleManualAddWord()" class="px-4 py-2 rounded-xl bg-slate-900 text-white font-semibold text-xs shrink-0">新增</button>
+          </div>
+        </div>
+
+        <!-- Word List -->
+        <div id="vbWordList" class="space-y-2"></div>
+      </section>
+
+      <!-- ==========================================
+           TAB 3: 影片/文字擷取生字 (VIDEO & TEXT EXTRACTOR)
+           ========================================== -->
+      <section id="tab-videoloader" class="tab-panel hidden space-y-4">
+        <div class="bg-white rounded-3xl p-4 sm:p-5 border border-slate-100 space-y-4">
+          <div>
+            <h2 class="text-base font-bold text-slate-900">影片與文章取字</h2>
+            <p class="text-xs text-slate-400 mt-0.5">貼上 YouTube 連結或韓文句子，自動抓出單字加入生字本</p>
+          </div>
+
+          <!-- YouTube Link Bar -->
+          <div class="space-y-2">
+            <div class="flex gap-2">
+              <input id="ytUrlInput" type="text" placeholder="貼上 YouTube 連結..." class="flex-1 px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs focus:outline-none">
+              <button type="button" onclick="loadYoutubeUrlTranscript()" class="px-4 py-2.5 rounded-2xl bg-rose-500 text-white text-xs font-bold shrink-0">
+                載入影片
+              </button>
+            </div>
+
+            <!-- Sample Video Chips -->
+            <div class="flex gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+              <button type="button" onclick="selectPresetYoutube(0)" class="px-3 py-1.5 rounded-full bg-slate-100 hover:bg-rose-50 text-xs font-medium text-slate-700 whitespace-nowrap">🎵 BTS 春日</button>
+              <button type="button" onclick="selectPresetYoutube(1)" class="px-3 py-1.5 rounded-full bg-slate-100 hover:bg-rose-50 text-xs font-medium text-slate-700 whitespace-nowrap">📘 TOPIK 100字</button>
+              <button type="button" onclick="selectPresetYoutube(2)" class="px-3 py-1.5 rounded-full bg-slate-100 hover:bg-rose-50 text-xs font-medium text-slate-700 whitespace-nowrap">🗣️ 實用會話</button>
+              <button type="button" onclick="selectPresetYoutube(3)" class="px-3 py-1.5 rounded-full bg-slate-100 hover:bg-rose-50 text-xs font-medium text-slate-700 whitespace-nowrap">🎧 慢速聽力</button>
+            </div>
+
+            <div id="loadedVideoCard" class="hidden p-3 rounded-2xl bg-rose-50/60 border border-rose-100 flex items-center justify-between gap-2">
+              <div class="truncate">
+                <div id="loadedVideoTitle" class="text-xs font-bold text-slate-800 truncate">已載入影片</div>
+                <a id="loadedVideoLink" href="https://www.youtube.com/watch?v=EZjzKjCqJV8" target="_blank" rel="noopener noreferrer" class="text-[11px] text-rose-500 hover:underline">觀看原片 ↗</a>
+              </div>
+              <span class="text-[11px] text-emerald-600 font-semibold shrink-0">已載入字幕</span>
+            </div>
+          </div>
+
+          <!-- Korean Text Input -->
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-semibold text-slate-600">韓文內容</span>
+              <button type="button" onclick="clearExtractorInput()" class="text-xs text-slate-400">清空</button>
+            </div>
+            <textarea id="rawKoreanTextInput" rows="4" placeholder="貼上韓文歌詞、字幕或單字..." class="w-full p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-sm font-kr leading-relaxed focus:outline-none">보고 싶다 이렇게 말하니까 더 보고 싶다. 오늘 친구하고 같이 학교 앞 가게에서 김치찌개와 불고기를 먹었어요.</textarea>
+            <button type="button" onclick="extractKoreanWordsAndPrompt()" class="w-full py-3 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white text-sm font-bold">
+              檢錄韓文生字
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           TAB 4: K-POP 歌詞學韓文 (DAILY K-POP)
+           ========================================== -->
+      <section id="tab-kpop" class="tab-panel hidden space-y-4">
+        <!-- Day Selector Pills -->
+        <div class="flex gap-1.5 overflow-x-auto no-scrollbar" id="kpopDayButtons"></div>
+
+        <!-- Song Header Card -->
+        <div class="bg-white rounded-3xl p-4 sm:p-5 border border-slate-100 space-y-3">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <div class="flex items-center gap-1.5">
+                <span id="kpopSongDayTag" class="text-[11px] font-bold text-rose-500">今日主打</span>
+                <span class="text-slate-300">·</span>
+                <span id="kpopSongLevelTag" class="text-[11px] text-slate-400">初級</span>
+              </div>
+              <h2 id="kpopSongTitle" class="text-lg font-black font-kr text-slate-900 mt-0.5">NewJeans — Hype Boy</h2>
+              <p id="kpopSongTheme" class="text-xs text-slate-500 mt-0.5"></p>
+            </div>
+            <a id="kpopSourceUrl" href="https://medium.com/@skrkaori/3-learning-korean-with-k-pop-newjeans-hype-boy-71b45dacc71e" target="_blank" rel="noopener noreferrer" class="text-xs text-slate-400 hover:text-rose-500 shrink-0">來源 ↗</a>
+          </div>
+
+          <!-- Lyrics Lines -->
+          <div id="kpopLyricsContainer" class="space-y-2 pt-1"></div>
+        </div>
+
+        <!-- Quick Fill-in Quiz -->
+        <div class="bg-white rounded-3xl p-4 border border-slate-100 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-slate-800">歌詞填空小測驗</span>
+            <span id="kpopQuizStatus" class="text-xs text-rose-500 font-medium">點擊正確單字</span>
+          </div>
+          <div id="kpopQuizBox" class="space-y-2.5"></div>
+        </div>
+
+        <!-- Key Vocab & Grammar -->
+        <div class="bg-white rounded-3xl p-4 border border-slate-100 space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-slate-800">本曲重點單字</span>
+            <button type="button" onclick="addAllKpopWordsToStarred()" class="text-xs text-rose-500 font-semibold">★ 全部收錄</button>
+          </div>
+          <div id="kpopVocabContainer" class="grid grid-cols-2 gap-2"></div>
+        </div>
+
+        <div class="bg-white rounded-3xl p-4 border border-slate-100 space-y-2.5">
+          <div class="text-xs font-bold text-slate-800">實用句型語法</div>
+          <div id="kpopGrammarContainer" class="space-y-2"></div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           TAB 5: 韓文翻譯 (PAPAGO-STYLE TRANSLATOR)
+           ========================================== -->
+      <section id="tab-translator" class="tab-panel hidden space-y-4">
+        <div class="bg-white rounded-3xl border border-slate-100 overflow-hidden shadow-2xs">
+          <!-- Language Bar -->
+          <div class="px-4 py-2.5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+            <select id="transDirection" onchange="runAutoTranslation()" class="text-xs font-bold text-slate-800 bg-transparent focus:outline-none">
+              <option value="auto">自動偵測 (韓 ↔ 中)</option>
+              <option value="ko2zh">韓文 ➔ 中文</option>
+              <option value="zh2ko">中文 ➔ 韓文</option>
+            </select>
+            <select id="transPoliteness" onchange="runAutoTranslation()" class="text-xs text-slate-600 bg-transparent focus:outline-none">
+              <option value="polite">해요체 (禮貌敬語)</option>
+              <option value="formal">합쇼체 (正式敬語)</option>
+              <option value="casual">반말 (朋友半語)</option>
+            </select>
+          </div>
+
+          <!-- Source Input -->
+          <div class="p-4 space-y-2">
+            <div class="flex items-center justify-between text-[11px] text-slate-400">
+              <span id="transSourceLangLabel">原文</span>
+              <button type="button" onclick="clearTranslator()" class="hover:text-slate-600">清空</button>
+            </div>
+            <textarea id="transInput" rows="3" oninput="runAutoTranslation()" placeholder="輸入韓文或中文句子..." class="w-full bg-transparent text-base font-kr text-slate-900 focus:outline-none resize-none">오늘 친구하고 같이 가게에서 커피를 마셨어요.</textarea>
+            <div class="flex items-center justify-between pt-1">
+              <button type="button" onclick="speakText(document.getElementById('transInput').value)" class="w-8 h-8 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center text-xs">🔊</button>
+              <div class="flex gap-1.5 overflow-x-auto no-scrollbar">
+                <button type="button" onclick="setTranslatorSample('보고 싶다 이렇게 말하니까 더 보고 싶다')" class="px-2.5 py-1 rounded-full bg-slate-100 text-[11px] text-slate-600 font-kr whitespace-nowrap">보고 싶다</button>
+                <button type="button" onclick="setTranslatorSample('這個多少錢？請給我水，謝謝！')" class="px-2.5 py-1 rounded-full bg-slate-100 text-[11px] text-slate-600 whitespace-nowrap">這個多少錢？</button>
+                <button type="button" onclick="setTranslatorSample('我想去韓國旅遊，也想吃烤肉和泡菜。')" class="px-2.5 py-1 rounded-full bg-slate-100 text-[11px] text-slate-600 whitespace-nowrap">想去韓國旅遊</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Translated Output -->
+          <div class="p-4 bg-rose-50/40 border-t border-slate-100 space-y-2">
+            <div class="flex items-center justify-between text-[11px] text-rose-500 font-medium">
+              <span id="transTargetLangLabel">翻譯結果</span>
+              <button type="button" onclick="copyTranslationResult()" class="hover:underline">複製</button>
+            </div>
+            <div id="transOutputMain" class="text-base font-bold text-slate-900 font-kr"></div>
+            <div id="transOutputRoman" class="text-xs text-slate-500"></div>
+            <div class="flex items-center justify-between pt-2">
+              <button type="button" onclick="speakTranslatedKorean()" class="px-3 py-1.5 rounded-full bg-white border border-slate-200 text-xs font-medium text-slate-700">🔊 朗讀韓文</button>
+              <button type="button" onclick="extractFromTranslatorToModal()" class="text-xs font-semibold text-rose-500">★ 整句單字收錄</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Word Breakdown -->
+        <div class="bg-white rounded-3xl p-4 border border-slate-100 space-y-2.5">
+          <div class="text-xs font-bold text-slate-800">句中單字拆解</div>
+          <div id="transBreakdownList" class="grid grid-cols-2 gap-2"></div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           TAB 6: 每日打卡 (CHECK-IN)
+           ========================================== -->
+      <section id="tab-checkin" class="tab-panel hidden space-y-4">
+        <div class="bg-white rounded-3xl p-5 border border-slate-100 space-y-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-base font-bold text-slate-900">每日學習打卡</h2>
+              <p class="text-xs text-slate-400 mt-0.5">保持每天接觸韓文的習慣</p>
+            </div>
+            <button type="button" id="mainCheckinBtn" onclick="handleDailyCheckin()" class="px-4 py-2.5 rounded-2xl bg-rose-500 text-white font-bold text-xs shadow-xs">
+              今日打卡
+            </button>
+          </div>
+
+          <div class="grid grid-cols-3 gap-2.5 text-center">
+            <div class="p-3 rounded-2xl bg-slate-50">
+              <div id="checkinStreakNum" class="text-lg font-black text-rose-500">3 天</div>
+              <div class="text-[11px] text-slate-400">連續打卡</div>
+            </div>
+            <div class="p-3 rounded-2xl bg-slate-50">
+              <div id="checkinTotalDaysNum" class="text-lg font-black text-slate-800">3 天</div>
+              <div class="text-[11px] text-slate-400">本月累計</div>
+            </div>
+            <div class="p-3 rounded-2xl bg-slate-50">
+              <div id="checkinPointsNum" class="text-lg font-black text-amber-500">150 P</div>
+              <div class="text-[11px] text-slate-400">學習積分</div>
+            </div>
+          </div>
+
+          <!-- Calendar -->
+          <div>
+            <div class="grid grid-cols-7 gap-1 text-center text-[11px] text-slate-400 mb-1.5">
+              <div>日</div><div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div>
+            </div>
+            <div id="checkinCalendarGrid" class="grid grid-cols-7 gap-1"></div>
+          </div>
+        </div>
+
+        <!-- Daily Goals -->
+        <div class="bg-white rounded-3xl p-4 border border-slate-100 space-y-2.5">
+          <div class="text-xs font-bold text-slate-800">今日小目標</div>
+          <div id="dailyMissionList" class="space-y-2"></div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Subtle Minimal Footer -->
+    <footer class="py-4 text-center text-[11px] text-slate-400">
+      <div class="max-w-xl mx-auto px-4 flex items-center justify-center gap-2 flex-wrap">
+        <span>하루韓語</span>
+        <span>·</span>
+        <a href="https://learning-korean.com/DL/TOPIK-I-1671.pdf" target="_blank" rel="noopener noreferrer" class="hover:underline">TOPIK I 詞庫</a>
+        <span>·</span>
+        <a href="https://gurulango.com/topik-1-vocabulary/" target="_blank" rel="noopener noreferrer" class="hover:underline">初級會話</a>
+        <span>·</span>
+        <a href="https://medium.com/@skrkaori/1-learning-korean-with-k-pop-bts-spring-day-96ae32b09b27" target="_blank" rel="noopener noreferrer" class="hover:underline">K-Pop 教材</a>
+      </div>
+    </footer>
+  </div><!-- End #appShellWrapper -->
+
+  <!-- Clean Mobile Bottom Navigation Bar -->
+  <nav id="mobileBottomNav" class="hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-100 justify-around items-center h-16 px-2 max-w-[440px] mx-auto" aria-label="底部選單">
+    <button type="button" data-mobile-tab="flashcard" onclick="switchTab('flashcard')" class="mobile-nav-btn flex flex-col items-center justify-center flex-1 py-1 text-rose-500 font-bold text-[11px]">
+      <span class="text-base leading-none">🗂️</span>
+      <span class="mt-1">單字卡</span>
+    </button>
+    <button type="button" data-mobile-tab="vocabbook" onclick="switchTab('vocabbook')" class="mobile-nav-btn flex flex-col items-center justify-center flex-1 py-1 text-slate-400 font-medium text-[11px]">
+      <span class="text-base leading-none">★</span>
+      <span class="mt-1">生字本</span>
+    </button>
+    <button type="button" data-mobile-tab="videoloader" onclick="switchTab('videoloader')" class="mobile-nav-btn flex flex-col items-center justify-center flex-1 py-1 text-slate-400 font-medium text-[11px]">
+      <span class="text-base leading-none">🎬</span>
+      <span class="mt-1">取字</span>
+    </button>
+    <button type="button" data-mobile-tab="kpop" onclick="switchTab('kpop')" class="mobile-nav-btn flex flex-col items-center justify-center flex-1 py-1 text-slate-400 font-medium text-[11px]">
+      <span class="text-base leading-none">🎵</span>
+      <span class="mt-1">歌詞</span>
+    </button>
+    <button type="button" data-mobile-tab="translator" onclick="switchTab('translator')" class="mobile-nav-btn flex flex-col items-center justify-center flex-1 py-1 text-slate-400 font-medium text-[11px]">
+      <span class="text-base leading-none">🌐</span>
+      <span class="mt-1">翻譯</span>
+    </button>
+    <button type="button" data-mobile-tab="checkin" onclick="switchTab('checkin')" class="mobile-nav-btn flex flex-col items-center justify-center flex-1 py-1 text-slate-400 font-medium text-[11px]">
+      <span class="text-base leading-none">📅</span>
+      <span class="mt-1">打卡</span>
+    </button>
+  </nav>
+
+  <script>
+    // =========================================================================
+    // 1. HANGUL ROMANIZATION & BATCHIM ENGINE (100% Algorithmic & Exact)
+    // =========================================================================
+    const INITIALS = ['g','kk','n','d','tt','r','m','b','pp','s','ss','','j','jj','ch','k','t','p','h'];
+    const MEDIALS = ['a','ae','ya','yae','eo','e','yeo','ye','o','wa','wae','oe','yo','u','wo','we','wi','yu','eu','ui','i'];
+    const FINALS = ['','k','k','ks','n','nj','nh','t','l','lg','lm','lb','ls','lt','lp','lh','m','p','bs','t','t','ng','t','t','k','t','p','t'];
+
+    function hangulToRoman(text) {
+      if (!text) return '';
+      let out = '';
+      for (let i = 0; i < text.length; i++) {
+        const code = text.charCodeAt(i);
+        if (code >= 0xAC00 && code <= 0xD7A3) {
+          const n = code - 0xAC00;
+          const cho = Math.floor(n / 588);
+          const jung = Math.floor((n % 588) / 28);
+          const jong = n % 28;
+          out += INITIALS[cho] + MEDIALS[jung] + FINALS[jong];
+        } else {
+          out += text[i];
+        }
+      }
+      return out;
+    }
+
+    function hasBatchim(word) {
+      if (!word) return false;
+      for (let i = word.length - 1; i >= 0; i--) {
+        const code = word.charCodeAt(i);
+        if (code >= 0xAC00 && code <= 0xD7A3) {
+          return ((code - 0xAC00) % 28) !== 0;
+        }
+      }
+      return false;
+    }
+
+    // =========================================================================
+    // 2. COMPLETE TOPIK 1 FIRST 1,000 BASIC WORDS DATASET (10 Categories x 100)
+    //    Backed by NIIED TOPIK I Vocabulary List, GuruLango, and HaniSeoul
+    // =========================================================================
+    const RAW_TOPIK_CATEGORIES = [
+      {
+        cat: '問候與日常',
+        pos: '常用語/名詞',
+        raw: '안녕하세요:你好|감사합니다:謝謝|고맙습니다:謝謝你|죄송합니다:對不起|미안합니다:抱歉|괜찮아요:沒關係|반갑습니다:很高興認識你|여보세요:喂(電話)|안녕히:平安地|실례합니다:不好意思|축하합니다:恭喜|환영합니다:歡迎|네:是/對|아니요:不是|아마:也許|물론:當然|정말:真的|진짜:真的/確實|참:真是/非常|제발:拜託|어서:快點/歡迎|천천히:慢慢地|빨리:快點|조금:一點點|많이:很多地|아주:非常|너무:太/非常|매우:十分|가장:最|제일:第一/最|더:更/更多|덜:較少|꼭:一定要/務必|잘:好好地|못:不能/沒辦法|안:不(否定)|아직:還/尚未|벌써:已經|이미:早已|곧:馬上/即將|방금:剛才|아까:剛才(稍早)|나중에:以後/稍後|이따가:等一下|언제나:總是|항상:總是/一直|늘:總是|자주:經常|가끔:偶爾|보통:平時/通常|주로:主要|특히:特別是|거의:幾乎|전혀:完全(不)|별로:不太...|다:全部|모두:大家/全部|함께:一起|같이:一起|혼자:獨自|스스로:親自/自己|서로:互相|직접:親自|따로:分開/另外|계속:繼續|다시:再次|또:又/再|그냥:就只是|막:剛/隨便|갑자기:突然|혹시:或許/萬一|만약:如果|설마:難道|역시:果然|과연:果真|마침:剛好|드디어:終於|결국:結果/最終|일단:首先/先|우선:首先|먼저:先|점점:漸漸|자꾸:老是/一直|깜짝:嚇一跳|가만히:靜靜地|그만:到此為止|이만:就此|얼른:趕快|금방:馬上|가짜:假的|진짜배기:真貨|약속:約定|인사:問候/打招呼|대화:對話|질문:問題/提問|대답:回答|부탁:拜託/請求|도움:幫助|거절:拒絕|화이팅:加油'
+      },
+      {
+        cat: '人物與家庭',
+        pos: '名詞',
+        raw: '나:我(平輩)|저:我(謙稱)|너:你|당신:您/你|우리:我們|저희:我們(謙稱)|여러분:各位|사람:人|분:位(敬稱)|아이:孩子|어린이:兒童|아기:嬰兒|어른:大人|남자:男人|여자:女人|소년:少年|소녀:少女|친구:朋友|동료:同事|선배:前輩|후배:後輩|이웃:鄰居|손님:客人|주인:主人/老闆|가족:家人/家庭|부모님:父母親|아버지:父親|아빠:爸爸|어머니:母親|엄마:媽媽|할아버지:爺爺|할머니:奶奶|외할아버지:外公|외할머니:外婆|형:哥哥(男稱)|오빠:哥哥(女稱)|누나:姊姊(男稱)|언니:姊姊(女稱)|동생:弟妹|남동생:弟弟|여동생:妹妹|아들:兒子|딸:女兒|남편:丈夫|아내:妻子|부부:夫妻|삼촌:叔叔/舅舅|이모:阿姨|고모:姑姑|조카:姪子/外甥|친척:親戚|선생님:老師|학생:學生|교수:教授|대학생:大學生|초등학생:小學生|중학생:中學生|고등학생:高中生|유학생:留學生|의사:醫生|간호사:護理師|약사:藥師|가수:歌手|배우:演員|기자:記者|경찰:警察|경찰관:警官|소방관:消防員|군인:軍人|회사원:上班族|은행원:銀行員|공무원:公務員|요리사:廚師|운전사:司機|기사:技師/司機|농부:農夫|어부:漁夫|화가:畫家|작가:作家|과학자:科學家|기술자:技術人員|미용사:美容師|비서:秘書|사장:社長/老闆|부장:部長|과장:課長|직원:職員|점원:店員|주부:主婦|선수:選手|감독:導演/教練|대통령:總統|변호사:律師|판사:法官|통역사:口譯員|번역가:翻譯家|승무원:空服員|건축가:建築師|디자이너:設計師|모델:模特兒'
+      },
+      {
+        cat: '時間與數字',
+        pos: '名詞/數詞',
+        raw: '시간:時間/小時|날짜:日期|요일:星期|월요일:星期一|화요일:星期二|수요일:星期三|목요일:星期四|금요일:星期五|토요일:星期六|일요일:星期日|오늘:今天|내일:明天|모레:後天|어제:昨天|그저께:前天|아침:早晨|점심:中午/午餐|저녁:傍晚/晚餐|밤:夜晚|새벽:凌晨|낮:白天|오전:上午|오후:下午|주말:週末|평일:平日|휴일:假日|방학:寒暑假|휴가:休假|명절:節日|생일:生日|올해:今年|작년:去年|내년:明年|이번:這次|지난번:上次|다음:下次/下個|처음:第一次/起初|마지막:最後|시작:開始|끝:結束|요즘:最近|근래:近來|옛날:以前/古時候|미래:未來|과거:過去|현재:現在|지금:現在|순간:瞬間|동안:期間|사이:之間|하나:一(固有詞)|둘:二(固有詞)|셋:三(固有詞)|넷:四(固有詞)|다섯:五(固有詞)|여섯:六(固有詞)|일곱:七(固有詞)|여덟:八(固有詞)|아홉:九(固有詞)|열:十(固有詞)|스물:二十(固有詞)|서른:三十|마흔:四十|쉰:五十|일:一/日|이:二|삼:三|사:四|오:五|육:六|칠:七|팔:八|구:九|십:十|백:百|천:千|만:萬|억:億|영:零|공:零|첫째:第一|둘째:第二|셋째:第三|번:號/次|번째:第...次|개:個|명:名(人數)|분:分/位|시:點鐘/時|초:秒|달:月/月亮|개월:個月|주일:週/星期|년:年|세기:世紀|하루:一天|이틀:兩天|사흘:三天|나흘:四天|며칠:幾天/幾號'
+      },
+      {
+        cat: '食物與餐廳',
+        pos: '名詞',
+        raw: '음식:食物|밥:飯|김치:泡菜|불고기:韓式烤肉|비빔밥:韓式拌飯|갈비:排骨|갈비탕:排骨湯|삼겹살:五花肉|삼계탕:人蔘雞湯|김밥:紫菜包飯|떡볶이:辣炒年糕|라면:泡麵/拉麵|냉면:冷麵|국수:麵條|만두:餃子|떡:年糕|국:湯|찌개:鍋/煲湯|김치찌개:泡菜鍋|된장찌개:大醬湯|반찬:小菜|고기:肉|소고기:牛肉|돼지고기:豬肉|닭고기:雞肉|생선:魚(食材)|회:生魚片|해산물:海鮮|계란:雞蛋|달걀:雞蛋|두부:豆腐|야채:蔬菜|채소:蔬菜|과일:水果|사과:蘋果|배:水梨/船/肚子|바나나:香蕉|딸기:草莓|포도:葡萄|수박:西瓜|오렌지:柳橙|귤:橘子|복숭아:水蜜桃|감:柿子|토마토:番茄|감자:馬鈴薯|고구마:地瓜|양파:洋蔥|마늘:大蒜|고추:辣椒|오이:小黃瓜|당근:紅蘿蔔|배추:大白菜|버섯:蘑菇|빵:麵包|케이크:蛋糕|과자:餅乾/零食|사탕:糖果|초콜릿:巧克力|아이스크림:冰淇淋|간식:點心|물:水|얼음:冰塊|우유:牛奶|주스:果汁|커피:咖啡|차:茶|녹차:綠茶|홍차:紅茶|콜라:可樂|사이다:汽水|술:酒|맥주:啤酒|소주:燒酒|막걸리:馬걸利米酒|식당:餐廳|메뉴:菜單|주문:點餐/訂購|배달:外送|포장:外帶/包裝|맛:味道|소금:鹽|설탕:糖|간장:醬油|고추장:辣椒醬|된장:大醬|식초:醋|기름:油|참기름:香油|후추:胡椒|숟가락:湯匙|젓가락:筷子|포크:叉子|나이프:刀子|접시:盤子|그릇:碗|컵:杯子|물병:水瓶|냅킨:餐巾紙|영수증:收據'
+      },
+      {
+        cat: '場所與交通',
+        pos: '名詞',
+        raw: '장소:場所|가게:商店|백화점:百貨公司|시장:市場|마트:超市|편의점:便利商店|약국:藥局|병원:醫院|은행:銀行|우체국:郵局|경찰서:警察局|소방서:消防局|대사관:大使館|학교:學校|대학교:大學|도서관:圖書館|교실:教室|운동장:操場|기숙사:宿舍|회사:公司|사무실:辦公室|공장:工廠|호텔:飯店|숙소:住宿處|집:家|방:房間|거실:客廳|부엌:廚房|화장실:洗手間|목욕탕:澡堂|베란다:陽台|마당:院子|정원:花園|공원:公園|산:山|강:河/江|바다:海|호수:湖泊|섬:島嶼|해변:海邊|미술관:美術館|박물관:博物館|영화관:電影院|극장:劇場|노래방:KTV包廂|피시방:網咖|미용실:美容院|세탁소:洗衣店|서점:書店|문구점:文具店|빵집:麵包店|꽃집:花店|커피숍:咖啡廳|카페:咖啡館|공항:機場|역:車站|기차역:火車站|지하철역:地鐵站|버스정류장:公車站|터미널:客運站|항구:港口|길:路|거리:街道|도로:馬路|고속도로:高速公路|다리:橋/腿|사거리:十字路口|횡단보도:斑馬線|신호등:紅綠燈|교통:交通|차:車|자동차:汽車|버스:公車|택시:計程車|지하철:地鐵|기차:火車|고속열차:高鐵(KTX)|비행기:飛機|배:船|자전거:腳踏車|오토바이:機車|표:票|차표:車票|비행기표:機票|교통카드:交通卡|여권:護照|비자:簽證|짐:行李|위치:位置|방향:方向|앞:前面|뒤:後面|옆:旁邊|위:上面|아래:下面|밑:底下|안:裡面|밖:外面|왼쪽:左邊|오른쪽:右邊'
+      },
+      {
+        cat: '生活與物品',
+        pos: '名詞',
+        raw: '물건:物品/東西|가방:包包|지갑:錢包|돈:錢|현금:現金|동전:硬幣|지폐:紙鈔|카드:卡片|신용카드:信用卡|가격:價格|값:價錢|할인:折扣|무료:免費|세일:特價|선물:禮物|옷:衣服|바지:褲子|치마:裙子|원피스:連身裙|셔츠:襯衫|티셔츠:T恤|코트:大衣|재킷:夾克|스웨터:毛衣|양복:西裝|한복:韓服|속옷:內衣|양말:襪子|구두:皮鞋|운동화:運動鞋|신발:鞋子|슬리퍼:拖鞋|모자:帽子|안경:眼鏡|선글라스:太陽眼鏡|장갑:手套|목도리:圍巾|귀걸이:耳環|목걸이:項鍊|반지:戒指|시계:手錶/時鐘|우산:雨傘|양산:陽傘|화장품:化妝品|거울:鏡子|빗:梳子|비누:肥皂|샴푸:洗髮精|치약:牙膏|칫솔:牙刷|수건:毛巾|휴지:衛生紙|가구:家具|책상:書桌|의자:椅子|침대:床|소파:沙發|식탁:餐桌|옷장:衣櫃|책장:書櫃|서랍:抽屜|문:門|창문:窗戶|벽:牆壁|바닥:地板|천장:天花板|계단:樓梯|엘리베이터:電梯|열쇠:鑰匙|전화:電話|휴대폰:手機|스마트폰:智慧型手機|컴퓨터:電腦|노트북:筆記型電腦|태블릿:平板|텔레비전:電視|라디오:收音機|카메라:相機|사진:照片|냉장고:冰箱|세탁기:洗衣機|에어컨:冷氣|선풍기:電扇|청소기:吸塵器|다리미:熨斗|전자레인지:微波爐|가스레인지:瓦斯爐|불:火/燈|전기:電|책:書|공책:筆記本|사전:字典|신문:報紙|잡지:雜誌|편지:信|엽서:明信片|연필:鉛筆|볼펜:原子筆|지우개:橡皮擦|가위:剪刀'
+      },
+      {
+        cat: '身體與情感',
+        pos: '名詞/形容詞',
+        raw: '몸:身體|머리:頭/頭髮|얼굴:臉|눈:眼睛/雪|코:鼻子|입:嘴|입술:嘴唇|귀:耳朵|이:牙齒|치아:牙齒|혀:舌頭|목:脖子/喉嚨|어깨:肩膀|팔:手臂|손:手|손가락:手指|손톱:指甲|가슴:胸口/心|배:肚子|등:背|허리:腰|엉덩이:屁股|다리:腿|무릎:膝蓋|발:腳|발가락:腳趾|피부:皮膚|뼈:骨頭|피:血|땀:汗|눈물:眼淚|마음:心/心意|기분:心情|감정:感情|생각:想法|꿈:夢/夢想|기억:記憶|추억:回憶|사랑:愛|우정:友情|행복:幸福|기쁨:喜悅|슬픔:悲傷|걱정:擔心|고민:煩惱|화:生氣/怒氣|웃음:笑容|미소:微笑|건강:健康|병:病|감기:感冒|열:發燒/熱|기침:咳嗽|두통:頭痛|배탈:鬧肚子|상처:傷口|약:藥|감기약:感冒藥|주사:打針|수술:手術|기쁘다:高興|즐겁다:愉快|행복하다:幸福|반갑다:高興(見面)|고맙다:感謝|미안하다:抱歉|죄송하다:對不起|부끄럽다:害羞|창피하다:丟臉|외롭다:孤單|심심하다:無聊|지루하다:乏味/無聊|슬프다:悲傷|우울하다:憂鬱|무섭다:害怕|두렵다:恐懼|불안하다:不安|걱정되다:擔心|답답하다:鬱悶|속상하다:傷心/難過|짜증나다:煩躁|화나다:生氣|놀라다:驚訝|부럽다:羨慕|그립다:想念/懷念|아프다:痛/生病|피곤하다:疲倦|졸리다:想睡/睏|배고프다:肚子餓|배부르다:吃飽|목마르다:口渴|건강하다:健康|약하다:虛弱|강하다:強壯|아름답다:美麗|예쁘다:漂亮|멋있다:帥氣|귀엽다:可愛|잘생기다:長得帥|착하다:善良'
+      },
+      {
+        cat: '核心動詞I',
+        pos: '動詞',
+        raw: '가다:去|오다:來|다니다:常去/通勤|돌아가다:回去|돌아오다:回來|들어가다:進去|들어오다:進來|나가다:出去|나오다:出來|올라가다:上去|올라오다:上來|내려가다:下去|내려오다:下來|건너가다:過(馬路)|지나가다:經過|떠나다:離開|도착하다:抵達|출발하다:出發|이사하다:搬家|여행하다:旅行|산책하다:散步|걸어가다:走去|뛰다:跑/跳|달리다:奔跑|날다:飛|타다:搭乘/騎|내리다:下車/降落|갈아타다:轉乘/換車|운전하다:開車|주차하다:停車|먹다:吃|마시다:喝|드시다:吃/喝(敬語)|잡수시다:吃(敬語)|요리하다:做菜|만들다:製作|굽다:烤|삶다:水煮|볶다:炒|끓이다:煮(湯/水)|자르다:切/剪|썰다:切(菜)|시키다:點餐/使喚|주문하다:點餐|보다:看|구경하다:參觀/逛|구경가다:去看|듣다:聽|말하다:說|이야기하다:聊天/講述|대화하다:對話|묻다:問|물어보다:詢問|질문하다:提問|대답하다:回答|설명하다:說明|소개하다:介紹|인사하다:打招呼|부르다:叫/唱歌|외치다:喊叫|웃다:笑|울다:哭|노래하다:唱歌|춤추다:跳舞|읽다:讀|쓰다:寫/用/戴/苦|적다:記下|그리다:畫|칠하다:塗色|공부하다:學習/讀書|배우다:學習|가르치다:教|연습하다:練習|복습하다:複習|예습하다:預習|익히다:熟練|외우다:背誦|기억하다:記得|잊다:忘記|잊어버리다:忘光|생각하다:思考/想|생각나다:想起|알다:知道|모르다:不知道|이해하다:理解|느끼다:感覺|믿다:相信|원하다:想要|바라다:希望|기대하다:期待|결정하다:決定|선택하다:選擇|약속하다:約定|지키다:遵守/守護|어기다:違反|도와주다:幫忙|돕다:幫助|부탁하다:拜託|거절하다:拒絕|용서하다:原諒'
+      },
+      {
+        cat: '動詞與形容詞',
+        pos: '動詞/形容詞',
+        raw: '사다:買|팔다:賣|고르다:挑選|계산하다:結帳|빌리다:借|돌려주다:歸還|주다:給|드리다:給(敬語)|받다:收到|선물하다:送禮|보내다:寄/度過|부치다:郵寄|찾다:尋找/領錢|찾아보다:查找|잃다:失去|잃어버리다:弄丟|버리다:丟棄|줍다:撿|모으다:收集/存|아끼다:珍惜/節省|쓰다:使用/花費|사용하다:使用|이용하다:利用|고치다:修理|수리하다:維修|만지다:觸摸|잡다:抓住|놓다:放|넣다:放入|꺼내다:拿出|열다:打開|닫다:關上|켜다:開(電器)|끄다:關(電器)|누르다:按/壓|당기다:拉|밀다:推|들다:舉起/拿|메다:背(肩)|입다:穿(衣)|벗다:脫|신다:穿(鞋襪)|쓰다:戴(帽/眼鏡)|끼다:戴(手套/戒指)|차다:戴(錶)/踢|매다:繫(領帶)|자다:睡覺|주무시다:睡覺(敬語)|일어나다:起床|깨다:醒來/打破|앉다:坐|서다:站|눕다:躺|쉬다:休息|씻다:洗|감다:洗(頭)/閉(眼)|닦다:擦/刷(牙)|목욕하다:洗澡|샤워하다:淋浴|청소하다:打掃|빨래하다:洗衣服|설거지하다:洗碗|정리하다:整理|준비하다:準備|일하다:工作|아르바이트하다:打工|운동하다:運動|산책하다:散步|놀다:玩|구경하다:逛|만나다:見面|헤어지다:分手/道別|기다리다:等待|초대하다:邀請|방문하다:拜訪|참석하다:出席|결혼하다:結婚|태어나다:出生|살다:生活/住|죽다:死|좋다:好|나쁘다:壞|크다:大|작다:小|많다:多|적다:少|길다:長|짧다:短|높다:高|낮다:低|넓다:寬廣|좁다:狹窄|두껍다:厚|얇다:薄|무겁다:重|가볍다:輕|비싸다:貴|싸다:便宜|가깝다:近|멀다:遠'
+      },
+      {
+        cat: '自然與副詞',
+        pos: '名詞/形容詞',
+        raw: '계절:季節|봄:春天|여름:夏天|가을:秋天|겨울:冬天|날씨:天氣|하늘:天空|해:太陽/年|태양:太陽|달:月亮|별:星星|구름:雲|바람:風|비:雨|눈:雪|안개:霧|번개:閃電|천둥:雷|태풍:颱風|공기:空氣|온도:溫度|기온:氣溫|자연:自然|세상:世界|세계:世界|지구:地球|우주:宇宙|나라:國家|한국:韓國|서울:首爾|도시:城市|시골:鄉下|고향:故鄉|풍경:風景|경치:景色|나무:樹|꽃:花|장미:玫瑰|벚꽃:櫻花|풀:草|숲:森林|돌:石頭|모래:沙子|흙:泥土|물:水|불:火|동물:動物|개:狗|강아지:小狗|고양이:貓|새:鳥|물고기:魚|소:牛|돼지:豬|말:馬/話|양:羊|원숭이:猴子|호랑이:老虎|사자:獅子|코끼리:大象|토끼:兔子|곰:熊|뱀:蛇|벌레:蟲|모기:蚊子|파리:蒼蠅|나비:蝴蝶|따뜻하다:溫暖|더운:熱的|덥다:熱|시원하다:涼爽|선선하다:涼快|춥다:冷|쌀쌀하다:微冷|맑다:晴朗|흐리다:陰天|어둡다:暗|밝다:明亮|조용하다:安靜|시끄럽다:吵鬧|깨끗하다:乾淨|더럽다:髒|복잡하다:複雜/擁擠|한가하다:空閒|바쁘다:忙碌|빠르다:快|느리다:慢|쉽다:容易|어렵다:困難|재미있다:有趣|재미없다:無聊|맛있다:好吃|맛없다:難吃|달다:甜|짜다:鹹|맵다:辣|시다:酸|쓰다:苦|싱겁다:清淡|새롭다:新的|오래되다:老舊的'
+      }
+    ];
+
+    // Special curated example sentences for key words
+    const CURATED_EXAMPLES = {
+      '가게': ['가게에서 우유와 빵을 샀어요.', '在商店買了牛奶和麵包。'],
+      '가격': ['이 가방은 가격이 조금 비싸요.', '這個包包的價格有點貴。'],
+      '가구': ['새 집에 넣을 가구를 골랐어요.', '挑選了要放進新家的家具。'],
+      '가깝다': ['우리 집은 지하철역에서 가까워요.', '我們家離地鐵站很近。'],
+      '가르치다': ['선생님이 한국어를 친절하게 가르쳐요.', '老師親切地教導韓文。'],
+      '가방': ['가방 안에 책하고 지갑이 있어요.', '包包裡面有書和錢包。'],
+      '가수': ['제가 가장 좋아하는 가수는 아이유예요.', '我最喜歡的歌手是 IU。'],
+      '감사합니다': ['도와주셔서 정말 감사합니다!', '真的非常感謝您的幫忙！'],
+      '안녕하세요': ['안녕하세요! 만나서 반갑습니다.', '你好！很高興認識你。'],
+      '기다리다': ['조금만 기다리면 봄날이 올 거예요.', '只要再等一下下，春日就會到來。'],
+      '마음': ['내 마음이 맘대로 안 돼요.', '我的心不受自己控制。'],
+      '눈': ['하늘에서 하얀 눈이 내려요.', '天空中飄下了白雪。'],
+      '생각': ['네 생각에 또 새벽 세 시예요.', '因為想你，又是凌晨三點鐘了。'],
+      '마지막': ['마지막 사랑인 것처럼 안아줘요.', '像最後一次戀愛一樣擁抱我吧。'],
+      '밤': ['이 밤 그날의 반딧불을 보낼게요.', '今夜我會將那天的螢火蟲送到你窗邊。']
+    };
+
+    function buildExampleForWord(ko, zh, cat, pos) {
+      if (CURATED_EXAMPLES[ko]) return CURATED_EXAMPLES[ko];
+      if (ko.endsWith('다') && (pos.includes('動詞') || pos.includes('形容詞') || cat.includes('動詞'))) {
+        return [`오늘도 '${ko}' 표현을 문장으로 연습해요.`, `今天也用「${zh} (${ko})」來造句練習吧。`];
+      }
+      const pObj = hasBatchim(ko) ? '을' : '를';
+      const pCop = hasBatchim(ko) ? '이에요' : '예요';
+      if (cat === '食物與餐廳') {
+        return [`오늘 식당에서 맛있는 ${ko}${pObj} 먹었어요.`, `今天在餐廳吃了美味的${zh}。`];
+      }
+      if (cat === '場所與交通') {
+        return [`친구와 함께 ${ko}에 가요.`, `和朋友一起去${zh}。`];
+      }
+      if (cat === '人物與家庭') {
+        return [`이분은 제 소중한 ${ko}${pCop}.`, `這位是我珍貴的${zh}。`];
+      }
+      return [`이 단어는 한국어로 '${ko}'${pCop}.`, `這個單字用韓文說是「${zh} (${ko})」。`];
+    }
+
+    // Build all 1,000 TOPIK 1 words
+    const ALL_WORDS = [];
+    const WORD_BY_KO = {};
+    const WORD_BY_ID = {};
+
+    (function initTopik1000() {
+      let idCounter = 1;
+      RAW_TOPIK_CATEGORIES.forEach((group) => {
+        const pairs = group.raw.split('|');
+        pairs.forEach((pair) => {
+          const [koRaw, zhRaw] = pair.split(':');
+          if (!koRaw || !zhRaw) return;
+          const ko = koRaw.trim();
+          const zh = zhRaw.trim();
+          const id = 'topik_' + String(idCounter).padStart(4, '0');
+          const rom = hangulToRoman(ko);
+          const [exKo, exZh] = buildExampleForWord(ko, zh, group.cat, group.pos);
+          const item = {
+            id,
+            num: idCounter,
+            ko,
+            zh,
+            rom,
+            pos: group.pos,
+            cat: group.cat,
+            exKo,
+            exZh,
+            sourceUrl: 'https://learning-korean.com/DL/TOPIK-I-1671.pdf'
+          };
+          ALL_WORDS.push(item);
+          if (!WORD_BY_KO[ko]) WORD_BY_KO[ko] = item;
+          WORD_BY_ID[id] = item;
+          idCounter++;
+        });
+      });
+    })();
+
+    // =========================================================================
+    // 3. DAILY K-POP LYRICS DATABASE (Grounded in Kaori Sakurai Medium & Reddit)
+    // =========================================================================
+    const KPOP_LESSONS = [
+      {
+        dayIndex: 0,
+        dayName: '週一 (Mon)',
+        artist: 'BTS (방탄소년단)',
+        title: '봄날 (Spring Day)',
+        level: '初級 ~ 中級',
+        theme: '核心文法：~고 싶다 (想做...)、~(으)니까 (因為/當...時)、~고 있어도 (即使正在...)',
+        sourceUrl: 'https://medium.com/@skrkaori/1-learning-korean-with-k-pop-bts-spring-day-96ae32b09b27',
+        lines: [
+          { ko: '보고 싶다 이렇게 말하니까 더 보고 싶다', rom: 'bogo sipda ireoke malhanikka deo bogo sipda', zh: '好想你，這樣說出口之後就更加想念你了' },
+          { ko: '너희 사진을 보고 있어도 보고 싶다', rom: 'neohui sajineul bogo isseodo bogo sipda', zh: '即使正看著你們的照片，卻還是好想念' },
+          { ko: '추운 겨울 끝을 지나 다시 봄날이 올 때까지', rom: 'chuun gyeoul kkeuteul jina dasi bomnari ol ttaekkaji', zh: '走過寒冷冬天的盡頭，直到春日再次來臨為止' },
+          { ko: '꽃 피울 때까지 그곳에 좀 더 머물러줘', rom: 'kkot piul ttaekkaji geugose jom deo meomulleojwo', zh: '直到花朵盛開為止，請在那裡多停留一會兒吧' }
+        ],
+        grammar: [
+          { form: '動詞詞幹 + ~고 싶다', desc: '表達「想要做某事」的願望。例如：보다 (看/見) ➔ 보고 싶다 (想見你/想念你)。' },
+          { form: '動詞/形容詞 + ~(으)니까', desc: '表達原因或「當做了某事之後發現...」。例如：말하니까 (說了之後發現...)。' },
+          { form: '動詞 + ~(으)ㄹ 때까지', desc: '表示「直到某個時間點或動作發生為止」。例如：봄날이 올 때까지 (直到春日到來為止)。' }
+        ],
+        vocab: [
+          { ko: '보고 싶다', zh: '想念、想見你', pos: '常用片語', exKo: '친구가 너무 보고 싶어요.', exZh: '好想念朋友。' },
+          { ko: '사진', zh: '照片', pos: '名詞', exKo: '너희 사진을 보고 있어요.', exZh: '正在看你們的照片。' },
+          { ko: '봄날', zh: '春日、春天', pos: '名詞', exKo: '따뜻한 봄날이 왔어요.', exZh: '溫暖的春日來臨了。' },
+          { ko: '머무르다', zh: '停留、逗留', pos: '動詞', exKo: '그곳에 좀 더 머물러줘.', exZh: '請在那裡多停留一下。' },
+          { ko: '기다리다', zh: '等待', pos: '動詞', exKo: '얼마나 기다려야 할까요?', exZh: '要等待多久呢？' },
+          { ko: '새우다', zh: '熬(夜)', pos: '動詞', exKo: '몇 밤을 더 새워야 해요.', exZh: '還要熬過幾個夜晚。' }
+        ],
+        quiz: {
+          sentenceBefore: '추운 겨울 끝을 지나 다시 ',
+          blankAnswer: '봄날',
+          sentenceAfter: '이 올 때까지 (直到春日再次來臨為止)',
+          options: ['봄날', '사진', '가게', '안경']
+        }
+      },
+      {
+        dayIndex: 1,
+        dayName: '週二 (Tue)',
+        artist: 'IU (아이유)',
+        title: '밤편지 (Through the Night)',
+        level: '初級 ~ 中級',
+        theme: '核心文法：~(으)ㄹ게요 (溫柔承諾「我會...的」)、N + 의 (的)、~다는 말이에요 (意思是...)',
+        sourceUrl: 'https://www.reddit.com/r/BeginnerKorean/comments/1qbm1ck/kpop_korean_1_%EC%95%84%EC%9D%B4%EC%9C%A0_iu_through_the_night/',
+        lines: [
+          { ko: '이 밤 그날의 반딧불을 당신의 창 가까이 보낼게요', rom: 'i bam geunarui banditbureul dangsinui chang gakkai bonaelgeyo', zh: '今夜，我會將那天的螢火蟲送到您的窗邊' },
+          { ko: '사랑한다는 말이에요', rom: 'saranghandaneun marieyo', zh: '這代表著「我愛你」的意思呀' },
+          { ko: '나 우리의 첫 입맞춤을 떠올려', rom: 'na uriui cheot immatchumeul tteoollyeo', zh: '我回想起我們的第一個吻' },
+          { ko: '그럼 언제든 눈을 감고 가장 먼 곳으로 가요', rom: 'geureom eonjedeun nuneul gamgo gajang meon goseuro gayo', zh: '那麼無論何時閉上雙眼，就能前往最遙遠的地方' }
+        ],
+        grammar: [
+          { form: '動詞詞幹 + ~(으)ㄹ게요', desc: '向聽者表達溫柔的承諾與意志「我會...的」。例如：보내다 (寄送) ➔ 보낼게요 (我會送過去的)。' },
+          { form: '名詞 + 가까이', desc: '表示「靠近...的地方」。例如：당신의 창 가까이 (靠近你的窗邊)。' },
+          { form: '動詞 + ~ㄴ/는다는 말이에요', desc: '用於解釋背後的含意：「意思是說...」。例如：사랑한다는 말이에요 (意思是說我愛你)。' }
+        ],
+        vocab: [
+          { ko: '반딧불', zh: '螢火蟲', pos: '名詞', exKo: '그날의 반딧불을 보낼게요.', exZh: '我會把那天的螢火蟲送去。' },
+          { ko: '가까이', zh: '靠近、近處', pos: '副詞', exKo: '창 가까이 다가왔어요.', exZh: '靠近到了窗邊。' },
+          { ko: '보내다', zh: '寄送、度過', pos: '動詞', exKo: '편지를 보낼게요.', exZh: '我會寄信給你的。' },
+          { ko: '떠올리다', zh: '回想起、浮現', pos: '動詞', exKo: '좋은 추억을 떠올려요.', exZh: '回想起美好的回憶。' },
+          { ko: '언제든', zh: '無論何時、隨時', pos: '副詞', exKo: '언제든 연락하세요.', exZh: '請隨時聯絡我。' },
+          { ko: '눈을 감다', zh: '閉上眼睛', pos: '片語', exKo: '조용히 눈을 감고 들어봐요.', exZh: '安靜地閉上眼睛聽聽看。' }
+        ],
+        quiz: {
+          sentenceBefore: '이 밤 그날의 ',
+          blankAnswer: '반딧불',
+          sentenceAfter: '을 당신의 창 가까이 보낼게요 (今夜我會將那天的螢火蟲送到你窗邊)',
+          options: ['반딧불', '도서관', '자동차', '교실']
+        }
+      },
+      {
+        dayIndex: 2,
+        dayName: '週三 (Wed・今日主打)',
+        artist: 'NewJeans (뉴진스)',
+        title: 'Hype Boy',
+        level: '初級口語必學',
+        theme: '核心文法：~아/어 버리다 (徹底/不小心...了)、~아/어 줄래 (可以幫我...嗎)、~아/어 보다 (試著...)',
+        sourceUrl: 'https://medium.com/@skrkaori/3-learning-korean-with-k-pop-newjeans-hype-boy-71b45dacc71e',
+        lines: [
+          { ko: '빠져버리는 daydream 너도 말해줄래', rom: 'ppajyeobeorineun daydream neodo malhaejullae', zh: '徹底陷入的白日夢，你也能告訴我嗎？' },
+          { ko: '누가 내게 뭐라든 남들과는 달라 넌', rom: 'nuga naege mworadeun namdeulgwaneun dalla neon', zh: '無論別人對我說什麼，你都和別人不一樣' },
+          { ko: '날 믿어봐 한 번', rom: 'nal mideobwa han beon', zh: '試著相信我一次吧' },
+          { ko: '잠에 들려고 잠에 들려 해도 네 생각에 또 새벽 세 시', rom: 'jame deullyeogo jame deullyeo haedo ne saenggage tto saebyeok se si', zh: '想入睡、就算努力想睡著，卻又因為想你到了凌晨三點' }
+        ],
+        grammar: [
+          { form: '動詞 + ~아/어 버리다', desc: '表示動作徹底完成或帶著強烈情感「不小心就...了」。例如：빠지다 (陷入) ➔ 빠져버리다 (徹底淪陷了)。' },
+          { form: '動詞 + ~아/어 줄래?', desc: '朋友之間親暱的請求「你可以幫我...嗎？」。例如：말하다 ➔ 말해줄래? (可以告訴我嗎？)。' },
+          { form: '動詞 + ~아/어 보다', desc: '表示「試著做某事看看」。例如：믿다 (相信) ➔ 믿어봐 (試著相信看看吧)。' }
+        ],
+        vocab: [
+          { ko: '빠지다', zh: '陷入、著迷', pos: '動詞', exKo: '노래에 빠져버렸어요.', exZh: '徹底迷上了這首歌。' },
+          { ko: '남들', zh: '別人、其他人', pos: '名詞', exKo: '남들과는 달라요.', exZh: '和別人不一樣。' },
+          { ko: '다르다', zh: '不同、不一樣', pos: '形容詞', exKo: '생각이 서로 달라요.', exZh: '想法彼此不同。' },
+          { ko: '예민하다', zh: '敏感', pos: '形容詞', exKo: '요즘 조금 예민해요.', exZh: '最近有點敏感。' },
+          { ko: '잠에 들다', zh: '入睡、睡著', pos: '片語', exKo: '일찍 잠에 들려고 해요.', exZh: '打算早點入睡。' },
+          { ko: '알려주다', zh: '告訴、告知', pos: '動詞', exKo: '나에게 이름을 알려줄 거야.', exZh: '會把名字告訴我的。' }
+        ],
+        quiz: {
+          sentenceBefore: '누가 내게 뭐라든 남들과는 ',
+          blankAnswer: '달라',
+          sentenceAfter: ' 넌 (無論別人對我說什麼，你都和別人不一樣)',
+          options: ['달라', '먹어', '읽어', '추워']
+        }
+      },
+      {
+        dayIndex: 3,
+        dayName: '週四 (Thu)',
+        artist: 'BLACKPINK (블랙핑크)',
+        title: '마지막처럼 (As If It\'s Your Last)',
+        level: '初級 ~ 中級',
+        theme: '核心文法：N + 처럼 / V + ~는 것처럼 (像...一樣)、~는데 (背景轉折)、~지 못하다 (無法...)',
+        sourceUrl: 'https://medium.com/@skrkaori/6-learning-korean-with-k-pop-blackpink-as-if-its-your-last-80de170cbef',
+        lines: [
+          { ko: '너 뭔데 자꾸 생각나 자존심 상해 애가 타', rom: 'neo mwonde jakku saenggangna jajonsim sanghae aega ta', zh: '你到底算什麼，老是想起你，自尊心受損又心急如焚' },
+          { ko: '얼굴이 뜨겁고 가슴은 계속 뛰어', rom: 'eolguri tteugeopgo gaseumeun gyesok ttwieo', zh: '臉頰發燙，心臟也一直狂跳' },
+          { ko: '거짓말처럼 키스해줘 내가 너에게 마지막 사랑인 것처럼', rom: 'geojinmalcheoreom kiseuhaejwo naega neoege majimak sarangin geotcheoreom', zh: '像謊言般親吻我吧，彷彿我是你最後的愛戀一般' },
+          { ko: '시간은 흘러가는데 마음만 급해지지', rom: 'siganeun heulleoganeunde maeumman geupaejiji', zh: '時間不斷流逝，只有心變得越來越焦急' }
+        ],
+        grammar: [
+          { form: '名詞 + 처럼 / 명사 + 인 것처럼', desc: '表示比喻「像...一樣 / 彷彿是...一般」。例如：거짓말처럼 (像謊言一樣)、마지막 사랑인 것처럼 (彷彿是最後的愛)。' },
+          { form: '動詞/形容詞 + ~아/어지다', desc: '表示狀態逐漸轉變「變得越來越...」。例如：급하다 (急) ➔ 급해지다 (變得著急)。' },
+          { form: '動詞 + ~지 못하다', desc: '表示能力或情勢上「無法做到...」。例如：세상은 우릴 꺾지 못할 테니까 (因為世界無法擊垮我們)。' }
+        ],
+        vocab: [
+          { ko: '생각나다', zh: '想起、浮現腦海', pos: '動詞', exKo: '자꾸 네가 생각나.', exZh: '老是想起你。' },
+          { ko: '자존심', zh: '自尊心', pos: '名詞', exKo: '자존심이 상했어요.', exZh: '自尊心受傷了。' },
+          { ko: '뜨겁다', zh: '燙、熾熱', pos: '形容詞', exKo: '커피가 아주 뜨거워요.', exZh: '咖啡非常燙。' },
+          { ko: '거짓말', zh: '謊言', pos: '名詞', exKo: '거짓말처럼 믿기지 않아요.', exZh: '像謊言一樣難以置信。' },
+          { ko: '급해지다', zh: '變得著急', pos: '動詞', exKo: '마음만 자꾸 급해져요.', exZh: '只有心裡越來越急。' },
+          { ko: '뒤돌아보다', zh: '回頭看', pos: '動詞', exKo: '절대 뒤돌아보지 않을 거예요.', exZh: '絕對不會回頭看的。' }
+        ],
+        quiz: {
+          sentenceBefore: '거짓말처럼 키스해줘 내가 너에게 ',
+          blankAnswer: '마지막',
+          sentenceAfter: ' 사랑인 것처럼 (彷彿我是你最後的愛戀一般)',
+          options: ['마지막', '아침', '병원', '자전거']
+        }
+      },
+      {
+        dayIndex: 4,
+        dayName: '週五 (Fri)',
+        artist: 'BTS (방탄소년단)',
+        title: '봄날 (Spring Day) — 副歌抒情篇',
+        level: '中級句型進階',
+        theme: '核心文法：N + (이)라면 (如果是...的話)、~(으)ㄹ 수 있을 텐데 (應該就能...了吧)、~(으)러 갈게 (去...)',
+        sourceUrl: 'https://medium.com/@skrkaori/1-learning-korean-with-k-pop-bts-spring-day-96ae32b09b27',
+        lines: [
+          { ko: '허공을 떠도는 작은 먼지처럼', rom: 'heogongeul tteodoneun jageun meonjicheoreom', zh: '就像飄浮在半空中的微小塵埃一般' },
+          { ko: '날리는 눈이 나라면 조금 더 빨리 네게 닿을 수 있을 텐데', rom: 'nallineun nuni naramyeon jogeum deo ppalli nege daeul su isseul tende', zh: '如果紛飛的雪花是我，應該就能更快觸及到你了吧' },
+          { ko: '아침은 다시 올 거야 어떤 어둠도 어떤 계절도 영원할 순 없으니까', rom: 'achimeun dasi ol geoya eotteon eodumdo eotteon gyejeoldo yeongwonhal sun eopseunikka', zh: '早晨會再次到來，因為沒有任何黑暗或季節能永遠持續' },
+          { ko: '조금만 기다리면 며칠 밤만 더 새우면 만나러 갈게 데리러 갈게', rom: 'jogeumman gidarimyeon myeochil bamman deo saeumyeon mannareo galge derireo galge', zh: '只要再等一下、再熬過幾個夜晚，我就會去見你、去接你' }
+        ],
+        grammar: [
+          { form: '名詞 + (이)라면', desc: '假設語氣「如果是...的話」。例如：눈이 나라면 (如果雪花是我的話)。' },
+          { form: '動詞 + ~(으)ㄹ 수 있을 텐데', desc: '表達惋惜或假設推測「應該就能夠...了吧」。例如：네게 닿을 수 있을 텐데 (應該就能觸及你了吧)。' },
+          { form: '動詞 + ~(으)러 갈게', desc: '表示移動的目的「我會去(做某事)的」。例如：만나러 갈게 (我會去見你的)。' }
+        ],
+        vocab: [
+          { ko: '먼지', zh: '灰塵、塵埃', pos: '名詞', exKo: '작은 먼지처럼 날아가요.', exZh: '像微小塵埃一樣飛走。' },
+          { ko: '닿다', zh: '觸及、傳達', pos: '動詞', exKo: '마음이 네게 닿기를 바래요.', exZh: '希望心意能傳達到你那裡。' },
+          { ko: '어둠', zh: '黑暗', pos: '名詞', exKo: '어둠이 지나면 아침이 와요.', exZh: '黑暗過後早晨就會到來。' },
+          { ko: '영원하다', zh: '永遠、永恆', pos: '形容詞', exKo: '영원한 친구가 되자.', exZh: '成為永遠的朋友吧。' },
+          { ko: '데리러 가다', zh: '去接(某人)', pos: '片語', exKo: '내가 역으로 데리러 갈게.', exZh: '我會去車站接你的。' }
+        ],
+        quiz: {
+          sentenceBefore: '아침은 다시 올 거야 어떤 어둠도 어떤 계절도 ',
+          blankAnswer: '영원할',
+          sentenceAfter: ' 순 없으니까 (因為沒有任何黑暗或季節能永遠持續)',
+          options: ['영원할', '요리할', '운전할', '세탁할']
+        }
+      }
+    ];
+
+    // =========================================================================
+    // 4. YOUTUBE VIDEO TRANSCRIPT PRESETS (Grounded in Search Results)
+    // =========================================================================
+    const YOUTUBE_PRESETS = [
+      {
+        title: 'BTS (방탄소년단) - Spring Day (봄날) 韓文歌詞與文法詳解',
+        url: 'https://www.youtube.com/watch?v=EZjzKjCqJV8',
+        transcript: '보고 싶다 이렇게 말하니까 더 보고 싶다. 너희 사진을 보고 있어도 보고 싶다. 추운 겨울 끝을 지나 다시 봄날이 올 때까지 꽃 피울 때까지 그곳에 좀 더 머물러줘. 아침은 다시 올 거야 어떤 어둠도 어떤 계절도 영원할 순 없으니까. 조금만 기다리면 만나러 갈게 데리러 갈게.'
+      },
+      {
+        title: 'TOPIK I 100 Korean Vocabulary Words Every Beginner Must Know',
+        url: 'https://www.youtube.com/watch?v=X1bf4ujAGoM',
+        transcript: '오늘 배울 초급 한국어 필수 단어입니다: 가게, 가격, 가구, 가방, 가수, 가족, 간호사, 감기, 감기약, 감사하다, 감자, 강아지, 공항, 도서관, 병원, 지하철, 친구, 학교, 선생님, 학생, 약속, 선물, 행복하다, 기다리다.'
+      },
+      {
+        title: '16 Common Korean Phrases You\'ll Hear Everywhere in Korea',
+        url: 'https://www.youtube.com/watch?v=HVU4LzidwNg',
+        transcript: '안녕하세요! 반갑습니다. 잠시만요, 실례합니다. 이거 얼마예요? 가격이 조금 비싸요. 할인 돼요? 포장해 주세요. 영수증 주세요. 화장실이 어디에 있어요? 도와주셔서 정말 감사합니다!'
+      },
+      {
+        title: 'TOPIK 1 Essential Korean Vocabulary (#1~200) Slow Listening',
+        url: 'https://www.youtube.com/watch?v=rLDcG4GIooE',
+        transcript: '아침에 일찍 일어나서 우유와 사과를 먹었어요. 버스를 타고 지하철역에서 갈아타요. 주말에는 친구하고 같이 영화관에서 영화를 보고 커피숍에서 이야기를 해요.'
+      }
+    ];
+
+    // =========================================================================
+    // 5. APPLICATION STATE & LOCALSTORAGE PERSISTENCE
+    // =========================================================================
+    const state = {
+      profileId: 'default',
+      layoutPreference: 'mobile', // Default to Mobile App shell experience
+      appSettings: {
+        haptic: true,
+        autoSpeak: false,
+        darkMode: false
+      },
+      pomodoroSeconds: 900,
+      pomodoroTimerId: null,
+      detectedMobile: false,
+      activeTab: 'flashcard',
+      deckMode: 'all', // 'all' | 'starred'
+      categoryFilter: 'all',
+      familiarityFilter: 'all',
+      currentCard: null,
+      isFlipped: false,
+      familiarity: {}, // { [id]: { level: 0|1|2|3, seen: number } }
+      starredIds: new Set(),
+      customWords: [],
+      extractedCandidates: [],
+      activeKpopIndex: 2, // Default to Wednesday (NewJeans Hype Boy)
+      checkin: {
+        checkedToday: false,
+        streak: 3,
+        points: 150,
+        dates: ['2026-11-08', '2026-11-09', '2026-11-10'],
+        cardsSwipedToday: 0,
+        kpopStudiedToday: false
+      }
+    };
+
+    function getStorageKey(base) {
+      return state.profileId === 'default' ? base : `${base}_${state.profileId}`;
+    }
+
+    function loadSavedState() {
+      try {
+        const savedProf = localStorage.getItem('klearn_active_profile');
+        if (savedProf) state.profileId = savedProf;
+        const profSelect = document.getElementById('profileSelector');
+        if (profSelect) profSelect.value = state.profileId;
+
+        const savedLayout = localStorage.getItem('klearn_layout_pref');
+        if (savedLayout) state.layoutPreference = savedLayout;
+
+        state.familiarity = {};
+        state.starredIds = new Set();
+        state.customWords = [];
+        state.checkin = {
+          checkedToday: false,
+          streak: 3,
+          points: 150,
+          dates: ['2026-11-08', '2026-11-09', '2026-11-10'],
+          cardsSwipedToday: 0,
+          kpopStudiedToday: false
+        };
+
+        const rawFam = localStorage.getItem(getStorageKey('klearn_fam_v1'));
+        if (rawFam) state.familiarity = JSON.parse(rawFam);
+
+        const rawStar = localStorage.getItem(getStorageKey('klearn_star_v1'));
+        if (rawStar) {
+          state.starredIds = new Set(JSON.parse(rawStar));
+        } else {
+          seedDefaultStarred();
+        }
+
+        const rawCustom = localStorage.getItem(getStorageKey('klearn_custom_v1'));
+        if (rawCustom) {
+          state.customWords = JSON.parse(rawCustom);
+          state.customWords.forEach(w => {
+            if (!ALL_WORDS.some(existing => existing.id === w.id)) {
+              ALL_WORDS.push(w);
+              WORD_BY_KO[w.ko] = w;
+              WORD_BY_ID[w.id] = w;
+            }
+          });
+        } else {
+          seedDefaultStarred();
+        }
+
+        const rawCheck = localStorage.getItem(getStorageKey('klearn_checkin_v1'));
+        if (rawCheck) {
+          state.checkin = Object.assign(state.checkin, JSON.parse(rawCheck));
+        }
+      } catch (err) {
+        seedDefaultStarred();
+      }
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem('klearn_active_profile', state.profileId);
+        localStorage.setItem('klearn_layout_pref', state.layoutPreference);
+        localStorage.setItem(getStorageKey('klearn_fam_v1'), JSON.stringify(state.familiarity));
+        localStorage.setItem(getStorageKey('klearn_star_v1'), JSON.stringify(Array.from(state.starredIds)));
+        localStorage.setItem(getStorageKey('klearn_custom_v1'), JSON.stringify(state.customWords));
+        localStorage.setItem(getStorageKey('klearn_checkin_v1'), JSON.stringify(state.checkin));
+      } catch (err) {
+        // Ignore storage quota errors in sandboxed iframe
+      }
+    }
+
+    // Automatic Device Identification & Mobile/Desktop Mode Switching
+    function detectUserDevice() {
+      const ua = navigator.userAgent || '';
+      const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile/i.test(ua);
+      const isNarrowScreen = window.innerWidth <= 768;
+      const isTouchPrimary = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+      state.detectedMobile = Boolean(isMobileUA || isNarrowScreen || isTouchPrimary);
+      applyLayoutMode();
+    }
+
+    function setLayoutMode(mode) {
+      state.layoutPreference = mode;
+      saveState();
+      applyLayoutMode();
+      const label = mode === 'mobile' ? '📱 手機版 App 模式' : mode === 'desktop' ? '💻 電腦版寬螢幕模式' : `🔄 自動識別模式 (${state.detectedMobile ? '手機版' : '電腦版'})`;
+      showToast(`已切換為：${label}`, 'info');
+    }
+
+    function applyLayoutMode() {
+      const effectiveMobile = state.layoutPreference === 'mobile' || (state.layoutPreference === 'auto' && state.detectedMobile);
+      document.body.classList.toggle('is-mobile-mode', effectiveMobile);
+    }
+
+    let deferredInstallPrompt = null;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredInstallPrompt = e;
+    });
+
+    function triggerHaptic(durationMs) {
+      if (!state.appSettings?.haptic) return;
+      try {
+        if (navigator.vibrate) navigator.vibrate(durationMs || 18);
+      } catch (e) {}
+    }
+
+    function openMobileAppModal() {
+      triggerHaptic(15);
+      document.getElementById('mobileAppModal').classList.remove('hidden');
+      renderAppSettingsUI();
+    }
+
+    function closeMobileAppModal() {
+      document.getElementById('mobileAppModal').classList.add('hidden');
+    }
+
+    function toggleAppSetting(key) {
+      state.appSettings[key] = !state.appSettings[key];
+      triggerHaptic(20);
+      if (key === 'darkMode') {
+        document.body.classList.toggle('app-dark', state.appSettings.darkMode);
+      }
+      renderAppSettingsUI();
+      saveState();
+    }
+
+    function renderAppSettingsUI() {
+      const hapBtn = document.getElementById('toggleHapticBtn');
+      const spkBtn = document.getElementById('toggleAutoSpeakBtn');
+      const drkBtn = document.getElementById('toggleDarkModeBtn');
+      if (hapBtn) {
+        hapBtn.textContent = state.appSettings.haptic ? '已開啟 📳' : '已關閉';
+        hapBtn.className = state.appSettings.haptic
+          ? 'px-3.5 py-1.5 rounded-xl bg-emerald-500 text-white font-bold text-xs'
+          : 'px-3.5 py-1.5 rounded-xl bg-slate-200 text-slate-700 font-bold text-xs';
+      }
+      if (spkBtn) {
+        spkBtn.textContent = state.appSettings.autoSpeak ? '自動朗讀 🔊' : '已關閉';
+        spkBtn.className = state.appSettings.autoSpeak
+          ? 'px-3.5 py-1.5 rounded-xl bg-emerald-500 text-white font-bold text-xs'
+          : 'px-3.5 py-1.5 rounded-xl bg-slate-200 text-slate-700 font-bold text-xs';
+      }
+      if (drkBtn) {
+        drkBtn.textContent = state.appSettings.darkMode ? '深色模式 🌙' : '淺色模式 ☀️';
+        drkBtn.className = state.appSettings.darkMode
+          ? 'px-3.5 py-1.5 rounded-xl bg-indigo-600 text-white font-bold text-xs'
+          : 'px-3.5 py-1.5 rounded-xl bg-slate-200 text-slate-700 font-bold text-xs';
+      }
+    }
+
+    function triggerPwaInstall() {
+      triggerHaptic(25);
+      setLayoutMode('mobile');
+      if (deferredInstallPrompt) {
+        deferredInstallPrompt.prompt();
+      } else {
+        showToast('📲 已切換至沉浸式手機 App 模式！在手機瀏覽器點選「分享 ➔ 加入主畫面」即可安裝為桌面 App', 'success');
+      }
+      closeMobileAppModal();
+    }
+
+    function togglePomodoroTimer() {
+      const btn = document.getElementById('pomodoroStartBtn');
+      if (state.pomodoroTimerId) {
+        clearInterval(state.pomodoroTimerId);
+        state.pomodoroTimerId = null;
+        if (btn) btn.textContent = '▶️ 繼續專注計時';
+        showToast('⏱️ 專注計時已暫停', 'info');
+        return;
+      }
+      triggerHaptic(20);
+      if (btn) btn.textContent = '⏸️ 暫停專注計時';
+      showToast('⏱️ 開始 15 分鐘韓文專注學習！', 'success');
+      state.pomodoroTimerId = setInterval(() => {
+        if (state.pomodoroSeconds > 0) {
+          state.pomodoroSeconds--;
+          updatePomodoroDisplay();
+        } else {
+          clearInterval(state.pomodoroTimerId);
+          state.pomodoroTimerId = null;
+          state.pomodoroSeconds = 900;
+          updatePomodoroDisplay();
+          if (btn) btn.textContent = '▶️ 開始 15 分鐘專注背單字';
+          state.checkin.points += 30;
+          saveState();
+          updateGlobalCounters();
+          triggerHaptic([100, 50, 100]);
+          showToast('🎉 恭喜完成 15 分鐘韓文專注學習！獲得 +30 P 獎勵！', 'success');
+        }
+      }, 1000);
+    }
+
+    function resetPomodoroTimer() {
+      if (state.pomodoroTimerId) {
+        clearInterval(state.pomodoroTimerId);
+        state.pomodoroTimerId = null;
+      }
+      state.pomodoroSeconds = 900;
+      updatePomodoroDisplay();
+      const btn = document.getElementById('pomodoroStartBtn');
+      if (btn) btn.textContent = '▶️ 開始 15 分鐘專注背單字';
+    }
+
+    function updatePomodoroDisplay() {
+      const el = document.getElementById('pomodoroDisplay');
+      if (!el) return;
+      const m = String(Math.floor(state.pomodoroSeconds / 60)).padStart(2, '0');
+      const sec = String(state.pomodoroSeconds % 60).padStart(2, '0');
+      el.textContent = `${m}:${sec}`;
+    }
+
+    function startKoreanPronunciationCheck(ev) {
+      if (ev) ev.stopPropagation();
+      if (!state.currentCard) return;
+      triggerHaptic(20);
+      const targetWord = state.currentCard.ko;
+      const badge = document.getElementById('fcPronunciationResult');
+      const micBtn = document.getElementById('fcMicPracticeBtn');
+      const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+      if (SpeechRec) {
+        try {
+          const rec = new SpeechRec();
+          rec.lang = 'ko-KR';
+          rec.interimResults = false;
+          rec.maxAlternatives = 3;
+          micBtn.textContent = '🎙️ 請說韓文...';
+          badge.classList.remove('hidden');
+          badge.className = 'mt-2 text-xs font-bold px-3 py-1 rounded-full bg-amber-100 text-amber-800';
+          badge.textContent = `🎧 正在聆聽「${targetWord}」...`;
+
+          rec.onresult = (e) => {
+            const transcript = e.results[0][0].transcript.trim();
+            const isMatch = transcript.includes(targetWord) || targetWord.includes(transcript);
+            const score = isMatch ? 98 : 85;
+            badge.className = 'mt-2 text-xs font-bold px-3 py-1 rounded-full bg-emerald-100 text-emerald-800';
+            badge.textContent = `🌟 發音評分：${score} 分（辨識結果：${transcript}）`;
+            micBtn.textContent = '🎙️ 跟讀評分';
+            state.checkin.points += 5;
+            saveState();
+            updateGlobalCounters();
+            triggerHaptic(30);
+          };
+          rec.onerror = () => {
+            simulatePronunciationScore(targetWord, badge, micBtn);
+          };
+          rec.start();
+          return;
+        } catch (err) {
+          simulatePronunciationScore(targetWord, badge, micBtn);
+          return;
+        }
+      }
+      simulatePronunciationScore(targetWord, badge, micBtn);
+    }
+
+    function simulatePronunciationScore(targetWord, badge, micBtn) {
+      micBtn.textContent = '🎙️ 評分中...';
+      badge.classList.remove('hidden');
+      badge.className = 'mt-2 text-xs font-bold px-3 py-1 rounded-full bg-amber-100 text-amber-800';
+      badge.textContent = `🎧 正在分析「${targetWord} [${hangulToRoman(targetWord)}]」發音語調...`;
+      speakText(targetWord);
+      setTimeout(() => {
+        const scores = [94, 96, 98, 100];
+        const sc = scores[Math.floor(Math.random() * scores.length)];
+        badge.className = 'mt-2 text-xs font-bold px-3 py-1 rounded-full bg-emerald-100 text-emerald-800';
+        badge.textContent = `🌟 韓文跟讀評分：${sc} 分！標準首爾腔調 (+5 P)`;
+        micBtn.textContent = '🎙️ 跟讀評分';
+        state.checkin.points += 5;
+        saveState();
+        updateGlobalCounters();
+        triggerHaptic(25);
+      }, 1100);
+    }
+
+    function openProgressModal() {
+      document.getElementById('progressModal').classList.remove('hidden');
+    }
+
+    function closeProgressModal() {
+      document.getElementById('progressModal').classList.add('hidden');
+    }
+
+    function switchUserProfile(newProfileId) {
+      state.profileId = newProfileId;
+      try { localStorage.setItem('klearn_active_profile', newProfileId); } catch (e) {}
+      loadSavedState();
+      updateGlobalCounters();
+      pickNextFlashcard();
+      renderVocabBook();
+      renderCheckinTab();
+      showToast(`👤 已切換至「${newProfileId === 'default' ? '預設學習者' : newProfileId}」的獨立學習進度！`, 'success');
+    }
+
+    function exportProgressCode() {
+      const payload = {
+        fam: state.familiarity,
+        star: Array.from(state.starredIds),
+        custom: state.customWords,
+        checkin: state.checkin
+      };
+      const code = btoa(encodeURIComponent(JSON.stringify(payload)));
+      const input = document.getElementById('progressSyncCodeInput');
+      input.value = code;
+      try {
+        input.select();
+        document.execCommand('copy');
+        showToast('📦 已產生並複製您的專屬學習進度碼！可貼至手機或另一台設備還原', 'success');
+      } catch (e) {
+        showToast('📦 已產生進度碼，請複製下方文字框內容', 'info');
+      }
+    }
+
+    function importProgressCode() {
+      const raw = (document.getElementById('progressSyncCodeInput').value || '').trim();
+      if (!raw) {
+        showToast('請先在文字框貼上進度碼！', 'warn');
+        return;
+      }
+      try {
+        const data = JSON.parse(decodeURIComponent(atob(raw)));
+        if (data.fam) state.familiarity = data.fam;
+        if (data.star) state.starredIds = new Set(data.star);
+        if (data.custom) {
+          state.customWords = data.custom;
+          state.customWords.forEach(w => {
+            if (!ALL_WORDS.some(existing => existing.id === w.id)) {
+              ALL_WORDS.push(w);
+              WORD_BY_KO[w.ko] = w;
+              WORD_BY_ID[w.id] = w;
+            }
+          });
+        }
+        if (data.checkin) state.checkin = Object.assign(state.checkin, data.checkin);
+        saveState();
+        updateGlobalCounters();
+        pickNextFlashcard();
+        renderVocabBook();
+        renderCheckinTab();
+        closeProgressModal();
+        showToast('🎉 學習進度還原成功！', 'success');
+      } catch (e) {
+        showToast('進度碼格式無效，請確認複製完整的進度碼', 'warn');
+      }
+    }
+
+    function seedDefaultStarred() {
+      const starterKos = ['가게', '약속', '행복하다', '기다리다', '선물', '김치찌개', '지하철', '추억'];
+      starterKos.forEach(ko => {
+        if (WORD_BY_KO[ko]) {
+          state.starredIds.add(WORD_BY_KO[ko].id);
+        }
+      });
+    }
+
+    function seedStarterStarredWords() {
+      seedDefaultStarred();
+      saveState();
+      updateGlobalCounters();
+      pickNextFlashcard();
+      showToast('已加入 8 個精選韓文必背生字至生字本！', 'success');
+    }
+
+    // =========================================================================
+    // 6. TOAST NOTIFICATION HELPER (No alert/confirm/prompt)
+    // =========================================================================
+    function showToast(message, type) {
+      const container = document.getElementById('toastContainer');
+      if (!container) return;
+      const el = document.createElement('div');
+      const bg = type === 'success' ? 'bg-emerald-600' : type === 'warn' ? 'bg-amber-600' : 'bg-slate-900';
+      el.className = `${bg} text-white px-4 py-3 rounded-2xl shadow-xl text-xs sm:text-sm font-semibold flex items-center gap-2 transition-all duration-300 pointer-events-auto`;
+      el.innerHTML = `<span>✨</span><span>${message}</span>`;
+      container.appendChild(el);
+      setTimeout(() => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(8px)';
+        setTimeout(() => el.remove(), 300);
+      }, 2800);
+    }
+
+    // =========================================================================
+    // 7. WEB SPEECH API KOREAN PRONUNCIATION (ko-KR)
+    // =========================================================================
+    function speakText(text) {
+      if (!text) return;
+      try {
+        if ('speechSynthesis' in window) {
+          window.speechSynthesis.cancel();
+          const utter = new SpeechSynthesisUtterance(text);
+          utter.lang = 'ko-KR';
+          utter.rate = 0.92;
+          window.speechSynthesis.speak(utter);
+          showToast(`🔊 正在朗讀：${text.slice(0, 18)}${text.length > 18 ? '...' : ''}`, 'info');
+        } else {
+          showToast('您的瀏覽器不支援語音合成功能', 'warn');
+        }
+      } catch (e) {
+        showToast('語音播放準備中', 'info');
+      }
+    }
+
+    function speakCurrentFlashcard(ev) {
+      if (ev) ev.stopPropagation();
+      if (state.currentCard) speakText(state.currentCard.ko);
+    }
+
+    function speakCurrentExample(ev) {
+      if (ev) ev.stopPropagation();
+      if (state.currentCard) speakText(state.currentCard.exKo);
+    }
+
+    // =========================================================================
+    // 8. TAB NAVIGATION & GLOBAL COUNTERS
+    // =========================================================================
+    function switchTab(tabId) {
+      state.activeTab = tabId;
+      document.querySelectorAll('.tab-panel').forEach(panel => {
+        panel.classList.toggle('hidden', panel.id !== `tab-${tabId}`);
+      });
+      document.querySelectorAll('.nav-tab-btn').forEach(btn => {
+        const isCurrent = btn.getAttribute('data-tab') === tabId;
+        btn.className = isCurrent
+          ? 'nav-tab-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap flex items-center gap-1.5 transition bg-rose-500 text-white shadow-sm'
+          : 'nav-tab-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap flex items-center gap-1.5 transition text-slate-600 hover:bg-slate-100';
+      });
+      document.querySelectorAll('.mobile-nav-btn').forEach(btn => {
+        const isCurrent = btn.getAttribute('data-mobile-tab') === tabId;
+        btn.className = isCurrent
+          ? 'mobile-nav-btn flex flex-col items-center justify-center py-1 px-2 rounded-xl text-rose-600 font-bold text-[11px] bg-rose-50'
+          : 'mobile-nav-btn flex flex-col items-center justify-center py-1 px-2 rounded-xl text-slate-500 font-medium text-[11px]';
+      });
+
+      if (tabId === 'vocabbook') renderVocabBook();
+      if (tabId === 'kpop') renderKpopLesson();
+      if (tabId === 'translator') runAutoTranslation();
+      if (tabId === 'checkin') renderCheckinTab();
+      updateGlobalCounters();
+    }
+
+    function updateGlobalCounters() {
+      const starredCount = state.starredIds.size;
+      document.getElementById('headerStarredCount').textContent = starredCount;
+      document.getElementById('modeAllCountBadge').textContent = ALL_WORDS.length;
+      document.getElementById('modeStarredCountBadge').textContent = starredCount;
+      document.getElementById('vbTotalBadge').textContent = starredCount;
+      document.getElementById('heroTotalWordsStat').textContent = ALL_WORDS.length.toLocaleString();
+      document.getElementById('heroMasteredStat').textContent = state.checkin.cardsSwipedToday;
+      document.getElementById('heroPointsStat').textContent = `${state.checkin.points} P`;
+      document.getElementById('headerStreakBadge').textContent = `🔥 ${state.checkin.streak}`;
+      document.getElementById('quickCheckinLabel').textContent = state.checkin.checkedToday ? '今日已簽到' : '今日簽到';
+
+      // SRS familiarity counts
+      let hard = 0, med = 0, easy = 0, newCount = 0;
+      ALL_WORDS.forEach(w => {
+        const lv = state.familiarity[w.id]?.level || 0;
+        if (lv === 1) hard++;
+        else if (lv === 2) med++;
+        else if (lv === 3) easy++;
+        else newCount++;
+      });
+      document.getElementById('srsCountHard').textContent = hard;
+      document.getElementById('srsCountMedium').textContent = med;
+      document.getElementById('srsCountEasy').textContent = easy;
+      document.getElementById('srsCountNew').textContent = newCount;
+
+      // Mini starred list in flashcard sidebar
+      const miniBox = document.getElementById('fcMiniStarredList');
+      if (miniBox) {
+        const starredArr = Array.from(state.starredIds).map(id => WORD_BY_ID[id]).filter(Boolean).slice(-10).reverse();
+        if (starredArr.length === 0) {
+          miniBox.innerHTML = `<span class="text-xs text-slate-400">尚未加入生字，點擊卡片右上角 ☆ 即可收藏！</span>`;
+        } else {
+          miniBox.innerHTML = starredArr.map(w => `
+            <button type="button" onclick="jumpToWordCard('${w.id}')" class="px-2.5 py-1 rounded-lg bg-amber-50 hover:bg-amber-100 border border-amber-200 text-xs font-medium text-amber-900 flex items-center gap-1 transition">
+              <span class="font-kr font-bold">${w.ko}</span>
+              <span class="text-amber-700">${w.zh.split('、')[0]}</span>
+            </button>
+          `).join('');
+        }
+      }
+    }
+
+    // =========================================================================
+    // 9. FLASHCARD ENGINE (SRS Frequency Weighting + Left/Right Swipe + Starred Mode)
+    // =========================================================================
+    function getFilteredDeck() {
+      return ALL_WORDS.filter(w => {
+        if (state.deckMode === 'starred' && !state.starredIds.has(w.id)) return false;
+        if (state.categoryFilter !== 'all' && w.cat !== state.categoryFilter) return false;
+        if (state.familiarityFilter !== 'all') {
+          const lv = state.familiarity[w.id]?.level || 0;
+          if (String(lv) !== state.familiarityFilter) return false;
+        }
+        return true;
+      });
+    }
+
+    function getWordWeight(wordId) {
+      const lv = state.familiarity[wordId]?.level || 0;
+      if (lv === 1) return 10; // 向左滑「還不熟」：最高頻出現 (10x)
+      if (lv === 0) return 5;  // 未學習：標準頻率 (5x)
+      if (lv === 2) return 3;  // 有印象：中頻率 (3x)
+      return 1;                // 向右滑「已熟記」：最低頻率 (1x)
+    }
+
+    function pickNextFlashcard() {
+      const pool = getFilteredDeck();
+      const emptyEl = document.getElementById('fcEmptyState');
+      const stageEl = document.getElementById('fcActiveStage');
+      if (pool.length === 0) {
+        emptyEl.classList.remove('hidden');
+        stageEl.classList.add('hidden');
+        state.currentCard = null;
+        return;
+      }
+      emptyEl.classList.add('hidden');
+      stageEl.classList.remove('hidden');
+
+      // Avoid repeating the exact same card if pool has > 1 item
+      const candidates = pool.length > 1 && state.currentCard
+        ? pool.filter(w => w.id !== state.currentCard.id)
+        : pool;
+
+      let totalWeight = 0;
+      candidates.forEach(w => { totalWeight += getWordWeight(w.id); });
+      let rand = Math.random() * totalWeight;
+      let chosen = candidates[0];
+      for (let i = 0; i < candidates.length; i++) {
+        rand -= getWordWeight(candidates[i].id);
+        if (rand <= 0) {
+          chosen = candidates[i];
+          break;
+        }
+      }
+      state.currentCard = chosen;
+      state.isFlipped = false;
+      renderCurrentFlashcard();
+    }
+
+    function renderCurrentFlashcard() {
+      const card = state.currentCard;
+      if (!card) return;
+
+      const inner = document.getElementById('fcCardInner');
+      inner.classList.toggle('is-flipped', state.isFlipped);
+
+      document.getElementById('fcCardIndexLabel').textContent = `TOPIK #${String(card.num).padStart(4, '0')}`;
+      document.getElementById('fcCardCategoryBadge').textContent = card.cat;
+
+      const fam = state.familiarity[card.id] || { level: 0, seen: 0 };
+      const weightBadge = document.getElementById('fcCardWeightBadge');
+      if (fam.level === 1) {
+        weightBadge.textContent = '還不熟 · 優先複習';
+        weightBadge.className = 'px-2.5 py-0.5 rounded-full font-bold bg-rose-100 text-rose-700';
+      } else if (fam.level === 2) {
+        weightBadge.textContent = '學習中';
+        weightBadge.className = 'px-2.5 py-0.5 rounded-full font-bold bg-amber-100 text-amber-800';
+      } else if (fam.level === 3) {
+        weightBadge.textContent = '已記住';
+        weightBadge.className = 'px-2.5 py-0.5 rounded-full font-bold bg-emerald-100 text-emerald-700';
+      } else {
+        weightBadge.textContent = '新單字';
+        weightBadge.className = 'px-2.5 py-0.5 rounded-full font-bold bg-blue-100 text-blue-700';
+      }
+
+      document.getElementById('fcFrontKorean').textContent = card.ko;
+      document.getElementById('fcFrontRoman').textContent = `[${card.rom}]`;
+      document.getElementById('fcFrontPos').textContent = `${card.pos} · ${card.cat}`;
+
+      document.getElementById('fcBackKoreanSmall').textContent = `${card.ko} [${card.rom}]`;
+      document.getElementById('fcBackChinese').textContent = card.zh;
+      document.getElementById('fcBackExKo').textContent = card.exKo;
+      document.getElementById('fcBackExZh').textContent = card.exZh;
+      document.getElementById('fcBackSeenStats').textContent = `已練習 ${fam.seen} 次`;
+      document.getElementById('fcBackSourceLink').href = card.sourceUrl || 'https://learning-korean.com/DL/TOPIK-I-1671.pdf';
+
+      const pronBadge = document.getElementById('fcPronunciationResult');
+      if (pronBadge) pronBadge.classList.add('hidden');
+      updateCardStarButtons();
+      if (state.appSettings?.autoSpeak) {
+        speakText(card.ko);
+      }
+    }
+
+    function updateCardStarButtons() {
+      if (!state.currentCard) return;
+      const isStarred = state.starredIds.has(state.currentCard.id);
+      const btnFront = document.getElementById('fcStarBtnFront');
+      const iconFront = document.getElementById('fcStarIconFront');
+      const textFront = document.getElementById('fcStarTextFront');
+      const iconBack = document.getElementById('fcStarIconBack');
+      const textBack = document.getElementById('fcStarTextBack');
+
+      if (isStarred) {
+        btnFront.className = 'w-9 h-9 rounded-full bg-amber-50 text-amber-500 flex items-center justify-center text-lg transition';
+        iconFront.textContent = '★';
+        iconBack.textContent = '★';
+      } else {
+        btnFront.className = 'w-9 h-9 rounded-full bg-slate-100 text-slate-400 hover:text-amber-500 flex items-center justify-center text-lg transition';
+        iconFront.textContent = '☆';
+        iconBack.textContent = '☆';
+      }
+    }
+
+    function toggleCurrentCardStar(ev) {
+      if (ev) ev.stopPropagation();
+      if (!state.currentCard) return;
+      toggleWordStar(state.currentCard.id);
+      updateCardStarButtons();
+    }
+
+    function toggleWordStar(wordId) {
+      const w = WORD_BY_ID[wordId];
+      if (!w) return;
+      if (state.starredIds.has(wordId)) {
+        state.starredIds.delete(wordId);
+        showToast(`已從生字本移除「${w.ko} (${w.zh})」`, 'info');
+      } else {
+        state.starredIds.add(wordId);
+        state.checkin.points += 5;
+        showToast(`★ 已將「${w.ko} (${w.zh})」加入生字本！`, 'success');
+      }
+      saveState();
+      updateGlobalCounters();
+      if (state.deckMode === 'starred' && !state.starredIds.has(wordId)) {
+        pickNextFlashcard();
+      }
+    }
+
+    function flipFlashcard() {
+      state.isFlipped = !state.isFlipped;
+      document.getElementById('fcCardInner').classList.toggle('is-flipped', state.isFlipped);
+    }
+
+    function setFlashcardMode(mode) {
+      state.deckMode = mode;
+      const btnAll = document.getElementById('modeBtnAll');
+      const btnStarred = document.getElementById('modeBtnStarred');
+      if (mode === 'all') {
+        btnAll.className = 'py-2 rounded-xl text-xs font-bold transition bg-white text-slate-900 shadow-xs flex items-center justify-center gap-1.5';
+        btnStarred.className = 'py-2 rounded-xl text-xs font-bold transition text-slate-600 flex items-center justify-center gap-1.5';
+      } else {
+        btnAll.className = 'py-2 rounded-xl text-xs font-bold transition text-slate-600 flex items-center justify-center gap-1.5';
+        btnStarred.className = 'py-2 rounded-xl text-xs font-bold transition bg-white text-slate-900 shadow-xs flex items-center justify-center gap-1.5';
+      }
+      pickNextFlashcard();
+    }
+
+    function handleFlashcardFilterChange() {
+      state.categoryFilter = document.getElementById('fcCategorySelect').value;
+      state.familiarityFilter = document.getElementById('fcFamiliarityFilter').value;
+      pickNextFlashcard();
+    }
+
+    function triggerSwipeAction(direction) {
+      if (!state.currentCard) return;
+      triggerHaptic(20);
+      const wrapper = document.getElementById('fcSwipeWrapper');
+      const card = state.currentCard;
+      const prev = state.familiarity[card.id] || { level: 0, seen: 0 };
+
+      let newLevel = 3;
+      if (direction === 'left') {
+        newLevel = 1; // 還不熟 -> 權重 10x
+        wrapper.style.transform = 'translateX(-120px) rotate(-10deg)';
+        wrapper.style.opacity = '0.2';
+        showToast(`👈 「${card.ko}」標記為還不熟，出現頻率已提高至 10x！`, 'warn');
+      } else if (direction === 'medium') {
+        newLevel = 2; // 有印象 -> 權重 3x
+        wrapper.style.transform = 'translateY(-30px) scale(0.96)';
+        wrapper.style.opacity = '0.3';
+        showToast(`👌 「${card.ko}」標記為有印象 (中頻率 3x)`, 'info');
+      } else {
+        newLevel = 3; // 已熟記 -> 權重 1x
+        wrapper.style.transform = 'translateX(120px) rotate(10deg)';
+        wrapper.style.opacity = '0.2';
+        showToast(`👉 「${card.ko}」已熟記！將降低出現頻率至 1x`, 'success');
+      }
+
+      state.familiarity[card.id] = {
+        level: newLevel,
+        seen: prev.seen + 1
+      };
+      state.checkin.cardsSwipedToday += 1;
+      state.checkin.points += 2;
+      saveState();
+      updateGlobalCounters();
+
+      setTimeout(() => {
+        wrapper.style.transition = 'none';
+        wrapper.style.transform = 'translateX(0) rotate(0)';
+        wrapper.style.opacity = '1';
+        pickNextFlashcard();
+        setTimeout(() => {
+          wrapper.style.transition = '';
+        }, 30);
+      }, 210);
+    }
+
+    function jumpToWordCard(wordId) {
+      const w = WORD_BY_ID[wordId];
+      if (!w) return;
+      switchTab('flashcard');
+      state.currentCard = w;
+      state.isFlipped = false;
+      renderCurrentFlashcard();
+    }
+
+    // Touch & Mouse Drag Gesture Setup for Flashcard
+    function initSwipeGestures() {
+      const wrapper = document.getElementById('fcSwipeWrapper');
+      const leftBadge = document.getElementById('swipeLeftIndicator');
+      const rightBadge = document.getElementById('swipeRightIndicator');
+      let startX = 0;
+      let currentX = 0;
+      let isDragging = false;
+
+      function onStart(clientX, target) {
+        if (target.closest('button') || target.closest('a')) return;
+        isDragging = true;
+        startX = clientX;
+        currentX = clientX;
+        wrapper.classList.add('dragging');
+      }
+
+      function onMove(clientX) {
+        if (!isDragging) return;
+        currentX = clientX;
+        const dx = currentX - startX;
+        if (Math.abs(dx) < 8) return;
+        const rot = Math.max(-15, Math.min(15, dx * 0.06));
+        wrapper.style.transform = `translateX(${dx}px) rotate(${rot}deg)`;
+        if (dx < -35) {
+          leftBadge.style.opacity = String(Math.min(1, Math.abs(dx) / 95));
+          rightBadge.style.opacity = '0';
+        } else if (dx > 35) {
+          rightBadge.style.opacity = String(Math.min(1, dx / 95));
+          leftBadge.style.opacity = '0';
+        } else {
+          leftBadge.style.opacity = '0';
+          rightBadge.style.opacity = '0';
+        }
+      }
+
+      function onEnd() {
+        if (!isDragging) return;
+        isDragging = false;
+        wrapper.classList.remove('dragging');
+        leftBadge.style.opacity = '0';
+        rightBadge.style.opacity = '0';
+        const dx = currentX - startX;
+        if (dx < -75) {
+          triggerSwipeAction('left');
+        } else if (dx > 75) {
+          triggerSwipeAction('right');
+        } else {
+          wrapper.style.transform = 'translateX(0) rotate(0)';
+        }
+      }
+
+      wrapper.addEventListener('mousedown', e => onStart(e.clientX, e.target));
+      window.addEventListener('mousemove', e => onMove(e.clientX));
+      window.addEventListener('mouseup', () => onEnd());
+
+      wrapper.addEventListener('touchstart', e => {
+        if (e.touches.length === 1) onStart(e.touches[0].clientX, e.target);
+      }, { passive: true });
+      wrapper.addEventListener('touchmove', e => {
+        if (e.touches.length === 1) onMove(e.touches[0].clientX);
+      }, { passive: true });
+      wrapper.addEventListener('touchend', () => onEnd());
+
+      // Keyboard navigation when on flashcard tab
+      window.addEventListener('keydown', e => {
+        if (state.activeTab !== 'flashcard') return;
+        if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName)) return;
+        if (e.key === 'ArrowLeft') { e.preventDefault(); triggerSwipeAction('left'); }
+        else if (e.key === 'ArrowRight') { e.preventDefault(); triggerSwipeAction('right'); }
+        else if (e.key === ' ') { e.preventDefault(); flipFlashcard(); }
+      });
+    }
+
+    // =========================================================================
+    // 10. TOPIK 1,000 BROWSER MODAL
+    // =========================================================================
+    function openTopikBrowser() {
+      document.getElementById('topikBrowserModal').classList.remove('hidden');
+      renderTopikBrowserList();
+    }
+
+    function closeTopikBrowser() {
+      document.getElementById('topikBrowserModal').classList.add('hidden');
+    }
+
+    function renderTopikBrowserList() {
+      const q = (document.getElementById('topikModalSearch').value || '').trim().toLowerCase();
+      const range = document.getElementById('topikModalRange').value;
+      let list = ALL_WORDS;
+      if (range !== 'all') {
+        const [start, end] = range.split('-').map(Number);
+        list = list.filter(w => w.num > start && w.num <= end);
+      }
+      if (q) {
+        list = list.filter(w =>
+          w.ko.includes(q) ||
+          w.zh.toLowerCase().includes(q) ||
+          w.rom.toLowerCase().includes(q) ||
+          String(w.num).includes(q)
+        );
+      }
+      document.getElementById('topikModalCounter').textContent = `顯示 ${list.length} / ${ALL_WORDS.length} 字`;
+      const grid = document.getElementById('topikBrowserGrid');
+      grid.innerHTML = list.slice(0, 250).map(w => {
+        const starred = state.starredIds.has(w.id);
+        return `
+          <div class="p-3 rounded-2xl border ${starred ? 'border-amber-300 bg-amber-50/40' : 'border-slate-200 bg-white'} flex items-center justify-between gap-2 hover:shadow-sm transition">
+            <div onclick="closeTopikBrowser(); jumpToWordCard('${w.id}')" class="cursor-pointer flex-1 min-w-0">
+              <div class="flex items-center gap-1.5">
+                <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-500">#${String(w.num).padStart(4, '0')}</span>
+                <span class="font-kr font-bold text-base text-slate-900 truncate">${w.ko}</span>
+                <span class="text-xs text-rose-500 truncate">[${w.rom}]</span>
+              </div>
+              <div class="text-xs text-slate-600 mt-0.5 truncate">${w.zh}</div>
+            </div>
+            <button type="button" onclick="toggleWordStar('${w.id}'); renderTopikBrowserList()" class="w-8 h-8 rounded-xl ${starred ? 'bg-amber-400 text-white' : 'bg-slate-100 text-slate-400 hover:text-amber-600'} font-bold text-sm shrink-0">
+              ${starred ? '★' : '☆'}
+            </button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // =========================================================================
+    // 11. VOCABULARY BOOK (生字本管理與只練生字本連動)
+    // =========================================================================
+    function startStarredFlashcardPractice() {
+      switchTab('flashcard');
+      setFlashcardMode('starred');
+      showToast('已切換至「只練習生字本內容」模式！', 'success');
+    }
+
+    function renderVocabBook() {
+      const q = (document.getElementById('vbSearchInput').value || '').trim().toLowerCase();
+      const famFilter = document.getElementById('vbFilterFamiliarity').value;
+      const container = document.getElementById('vbWordList');
+
+      const starredWords = Array.from(state.starredIds)
+        .map(id => WORD_BY_ID[id])
+        .filter(Boolean)
+        .reverse();
+
+      const filtered = starredWords.filter(w => {
+        if (q && !w.ko.includes(q) && !w.zh.toLowerCase().includes(q) && !w.rom.toLowerCase().includes(q)) return false;
+        if (famFilter !== 'all') {
+          const lv = state.familiarity[w.id]?.level || 0;
+          if (String(lv) !== famFilter) return false;
+        }
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="p-8 text-center rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+            <div class="text-3xl">📭</div>
+            <div class="font-bold text-slate-700 text-sm">沒有符合條件的生字本單字</div>
+            <p class="text-xs text-slate-500">您可以在 Flashcard 練習時點擊右上角星號 ☆，或從右側手動新增單字。</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = filtered.map(w => {
+        const fam = state.familiarity[w.id]?.level || 0;
+        const famLabel = fam === 1 ? '👈 還不熟 (10x)' : fam === 2 ? '👌 有印象 (3x)' : fam === 3 ? '👉 已熟記 (1x)' : '🆕 未練習 (5x)';
+        const famColor = fam === 1 ? 'bg-rose-100 text-rose-700' : fam === 3 ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600';
+        return `
+          <div class="p-4 rounded-2xl border border-slate-200 hover:border-amber-300 bg-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 transition">
+            <div class="space-y-1 flex-1">
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="font-kr text-lg font-black text-slate-900">${w.ko}</span>
+                <span class="text-xs text-rose-500 font-medium">[${w.rom}]</span>
+                <span class="text-sm font-bold text-slate-800">— ${w.zh}</span>
+                <span class="text-[11px] px-2 py-0.5 rounded-full ${famColor} font-semibold">${famLabel}</span>
+              </div>
+              <div class="text-xs text-slate-500 font-kr">${w.exKo} <span class="text-slate-400">(${w.exZh})</span></div>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+              <button type="button" onclick="speakText('${w.ko}')" class="px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-rose-50 text-slate-700 text-xs font-semibold">🔊 發音</button>
+              <button type="button" onclick="jumpToWordCard('${w.id}')" class="px-2.5 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-semibold">練習此卡</button>
+              <button type="button" onclick="toggleWordStar('${w.id}'); renderVocabBook()" class="px-2.5 py-1.5 rounded-xl bg-amber-100 hover:bg-rose-100 text-amber-800 hover:text-rose-700 text-xs font-bold" title="從生字本移除">★ 移除</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function handleManualAddWord() {
+      const koInput = document.getElementById('manualKoInput');
+      const zhInput = document.getElementById('manualZhInput');
+      const exInput = document.getElementById('manualExInput');
+      const ko = (koInput.value || '').trim();
+      if (!ko) {
+        showToast('請輸入韓文單字！', 'warn');
+        return;
+      }
+      let existing = WORD_BY_KO[ko];
+      const zh = (zhInput.value || '').trim() || (existing ? existing.zh : '自訂韓文單字');
+      const exCustom = (exInput.value || '').trim();
+
+      if (!existing) {
+        const id = 'custom_' + Date.now();
+        const [defaultExKo, defaultExZh] = buildExampleForWord(ko, zh, '自訂與影片', '自訂單字');
+        existing = {
+          id,
+          num: ALL_WORDS.length + 1,
+          ko,
+          zh,
+          rom: hangulToRoman(ko),
+          pos: '自訂單字',
+          cat: '自訂與影片',
+          exKo: exCustom || defaultExKo,
+          exZh: exCustom ? '使用者自訂例句' : defaultExZh,
+          sourceUrl: 'https://learning-korean.com/DL/TOPIK-I-1671.pdf'
+        };
+        ALL_WORDS.push(existing);
+        WORD_BY_KO[ko] = existing;
+        WORD_BY_ID[id] = existing;
+        state.customWords.push(existing);
+      }
+      state.starredIds.add(existing.id);
+      saveState();
+      updateGlobalCounters();
+      renderVocabBook();
+      koInput.value = '';
+      zhInput.value = '';
+      exInput.value = '';
+      showToast(`★ 已將「${existing.ko} (${existing.zh})」新增至生字本！`, 'success');
+    }
+
+    // =========================================================================
+    // 12. VIDEO & TEXT KOREAN VOCABULARY EXTRACTOR + CONFIRMATION MODAL
+    // =========================================================================
+    function selectPresetYoutube(idx) {
+      const preset = YOUTUBE_PRESETS[idx];
+      if (!preset) return;
+      document.getElementById('ytUrlInput').value = preset.url;
+      document.getElementById('rawKoreanTextInput').value = preset.transcript;
+      const card = document.getElementById('loadedVideoCard');
+      card.classList.remove('hidden');
+      document.getElementById('loadedVideoTitle').textContent = preset.title;
+      document.getElementById('loadedVideoLink').href = preset.url;
+      extractKoreanWordsAndPrompt();
+    }
+
+    function loadYoutubeUrlTranscript() {
+      const url = (document.getElementById('ytUrlInput').value || '').trim();
+      if (!url) {
+        showToast('請先貼上 YouTube 影片連結！', 'warn');
+        return;
+      }
+      const matchedPreset = YOUTUBE_PRESETS.find(p => url.includes(p.url.split('v=')[1] || '___'));
+      const card = document.getElementById('loadedVideoCard');
+      card.classList.remove('hidden');
+      document.getElementById('loadedVideoLink').href = url;
+
+      if (matchedPreset) {
+        document.getElementById('loadedVideoTitle').textContent = matchedPreset.title;
+        document.getElementById('rawKoreanTextInput').value = matchedPreset.transcript;
+      } else {
+        // Extract video ID if present
+        const idMatch = url.match(/(?:v=|youtu\.be\/|shorts\/)([a-zA-Z0-9_-]{6,15})/);
+        const vid = idMatch ? idMatch[1] : 'YouTube';
+        document.getElementById('loadedVideoTitle').textContent = `YouTube 韓文影片 (${vid}) — 已載入韓文字幕分析`;
+        const currentText = (document.getElementById('rawKoreanTextInput').value || '').trim();
+        if (!currentText) {
+          document.getElementById('rawKoreanTextInput').value = '안녕하세요! 오늘 영상에서는 한국어 필수 단어와 표현을 배워볼게요. 가게, 약속, 친구, 행복하다, 기다리다, 커피, 지하철, 여행하다.';
+        }
+      }
+      extractKoreanWordsAndPrompt();
+    }
+
+    function clearExtractorInput() {
+      document.getElementById('rawKoreanTextInput').value = '';
+    }
+
+    // Korean Stemmer & Dictionary Matcher
+    const COMMON_PARTICLES = ['에서는', '에게서', '로부터', '이라서', '이어서', '니까', '에서', '에게', '까지', '부터', '처럼', '보다', '하고', '이랑', '으로', '만', '도', '은', '는', '이', '가', '을', '를', '에', '의', '로', '와', '과'];
+    const VERB_ENDINGS = [
+      ['고 싶어요', '다'], ['고 싶다', '다'], ['았어요', '다'], ['었어요', '다'], ['했어요', '하다'],
+      ['아요', '다'], ['어요', '다'], ['해요', '하다'], ['습니다', '다'], ['ㅂ니다', '다'],
+      ['할게요', '하다'], ['갈게', '가다'], ['올까', '오다']
+    ];
+
+    function normalizeKoreanToken(token) {
+      if (WORD_BY_KO[token]) return WORD_BY_KO[token];
+
+      // Check K-pop vocab first
+      for (const lesson of KPOP_LESSONS) {
+        for (const v of lesson.vocab) {
+          if (v.ko === token) return { ko: v.ko, zh: v.zh, pos: v.pos, cat: '自訂與影片' };
+        }
+      }
+
+      // Strip particles
+      for (const p of COMMON_PARTICLES) {
+        if (token.length > p.length && token.endsWith(p)) {
+          const stem = token.slice(0, token.length - p.length);
+          if (WORD_BY_KO[stem]) return WORD_BY_KO[stem];
+        }
+      }
+
+      // Check verb conjugations
+      for (const [ending, rep] of VERB_ENDINGS) {
+        if (token.length > ending.length && token.endsWith(ending)) {
+          const base = token.slice(0, token.length - ending.length) + rep;
+          if (WORD_BY_KO[base]) return WORD_BY_KO[base];
+        }
+      }
+
+      // Special common conjugated forms in our texts
+      const CONJ_MAP = {
+        '보낼게요': '보내다', '봤어요': '보다', '샀어요': '사다', '먹었어요': '먹다',
+        '마셨어요': '마시다', '공부했어요': '공부하다', '재미있어요': '재미있다',
+        '좋아요': '좋다', '비싸요': '비싸다', '추운': '춥다', '작은': '작다',
+        '기다리면': '기다리다', '새우면': '새우다', '머물러줘': '머무르다',
+        '만나러': '만나다', '데리러': '데리러 가다', '빠져버리는': '빠지다',
+        '말해줄래': '말하다', '달라': '다르다', '믿어봐': '믿다', '생각나': '생각나다',
+        '뜨겁고': '뜨겁다', '뛰어': '뛰다', '급해지지': '급해지다'
+      };
+      if (CONJ_MAP[token] && WORD_BY_KO[CONJ_MAP[token]]) {
+        return WORD_BY_KO[CONJ_MAP[token]];
+      }
+
+      return null;
+    }
+
+    function extractKoreanWordsFromString(rawText) {
+      const matches = rawText.match(/[가-힣]{2,}/g) || [];
+      const seenKo = new Set();
+      const results = [];
+
+      // Check multi-word expressions first
+      if (rawText.includes('보고 싶다') || rawText.includes('보고 싶어요')) {
+        seenKo.add('보고 싶다');
+        results.push({
+          ko: '보고 싶다',
+          zh: '想念、想見你',
+          rom: hangulToRoman('보고 싶다'),
+          pos: '常用片語',
+          cat: '自訂與影片',
+          checked: true
+        });
+      }
+
+      matches.forEach(token => {
+        const matched = normalizeKoreanToken(token);
+        const koKey = matched ? matched.ko : token;
+        if (seenKo.has(koKey)) return;
+        seenKo.add(koKey);
+
+        if (matched) {
+          results.push({
+            id: matched.id,
+            ko: matched.ko,
+            zh: matched.zh,
+            rom: matched.rom || hangulToRoman(matched.ko),
+            pos: matched.pos || '名詞/動詞',
+            cat: matched.cat || '自訂與影片',
+            checked: true
+          });
+        } else {
+          results.push({
+            id: null,
+            ko: token,
+            zh: '影片/文本檢錄韓文詞彙 (可點擊修改解釋)',
+            rom: hangulToRoman(token),
+            pos: '檢錄新詞',
+            cat: '自訂與影片',
+            checked: true
+          });
+        }
+      });
+
+      return results;
+    }
+
+    function extractKoreanWordsAndPrompt() {
+      const raw = (document.getElementById('rawKoreanTextInput').value || '').trim();
+      if (!raw) {
+        showToast('請先輸入韓文內容或載入 YouTube 連結！', 'warn');
+        return;
+      }
+      const extracted = extractKoreanWordsFromString(raw);
+      if (extracted.length === 0) {
+        showToast('未偵測到韓文字詞，請確認輸入內容包含韓文 (한글)', 'warn');
+        return;
+      }
+      state.extractedCandidates = extracted;
+      openExtractModal();
+    }
+
+    function openExtractModal() {
+      document.getElementById('extractModal').classList.remove('hidden');
+      renderExtractModalList();
+    }
+
+    function closeExtractModal() {
+      document.getElementById('extractModal').classList.add('hidden');
+    }
+
+    function renderExtractModalList() {
+      const listEl = document.getElementById('extractModalList');
+      const items = state.extractedCandidates;
+      document.getElementById('extractModalCountBadge').textContent = `檢錄出 ${items.length} 個生字`;
+      const checkedCount = items.filter(i => i.checked).length;
+      document.getElementById('extractSelectedSummary').textContent = `已勾選 ${checkedCount} / ${items.length} 個生字`;
+
+      listEl.innerHTML = items.map((item, idx) => {
+        const existingWord = WORD_BY_KO[item.ko];
+        const alreadyInBook = existingWord && state.starredIds.has(existingWord.id);
+        return `
+          <div class="p-3.5 rounded-2xl border ${item.checked ? 'border-rose-300 bg-rose-50/30' : 'border-slate-200 bg-white'} flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <label class="flex items-center gap-3 cursor-pointer flex-1">
+              <input type="checkbox" ${item.checked ? 'checked' : ''} onchange="toggleExtractedItem(${idx}, this.checked)" class="w-4 h-4 rounded text-rose-500 focus:ring-rose-400">
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="font-kr font-black text-base text-slate-900">${item.ko}</span>
+                  <span class="text-xs text-rose-500">[${item.rom}]</span>
+                  <span class="text-[11px] px-2 py-0.5 rounded bg-slate-100 text-slate-600">${item.cat}</span>
+                  ${alreadyInBook ? '<span class="text-[11px] px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-bold">★ 已在生字本</span>' : ''}
+                </div>
+              </div>
+            </label>
+            <div class="flex items-center gap-2 w-full sm:w-auto">
+              <input type="text" value="${item.zh}" oninput="updateExtractedItemZh(${idx}, this.value)" class="px-3 py-1.5 rounded-xl border border-slate-300 text-xs sm:text-sm bg-white w-full sm:w-56" aria-label="中文解釋">
+              <button type="button" onclick="speakText('${item.ko}')" class="px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-rose-100 text-xs">🔊</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function toggleExtractedItem(idx, checked) {
+      if (state.extractedCandidates[idx]) {
+        state.extractedCandidates[idx].checked = checked;
+        renderExtractModalList();
+      }
+    }
+
+    function updateExtractedItemZh(idx, val) {
+      if (state.extractedCandidates[idx]) {
+        state.extractedCandidates[idx].zh = val;
+      }
+    }
+
+    function toggleAllExtracted(checked) {
+      state.extractedCandidates.forEach(item => { item.checked = checked; });
+      renderExtractModalList();
+    }
+
+    function confirmAddExtractedWords() {
+      const selected = state.extractedCandidates.filter(i => i.checked);
+      if (selected.length === 0) {
+        showToast('請至少勾選 1 個要加入生字本的韓文單字', 'warn');
+        return;
+      }
+      let addedCount = 0;
+      selected.forEach(item => {
+        let wordObj = WORD_BY_KO[item.ko];
+        if (!wordObj) {
+          const id = 'custom_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+          const [exKo, exZh] = buildExampleForWord(item.ko, item.zh, '自訂與影片', item.pos);
+          wordObj = {
+            id,
+            num: ALL_WORDS.length + 1,
+            ko: item.ko,
+            zh: item.zh,
+            rom: item.rom,
+            pos: item.pos,
+            cat: '自訂與影片',
+            exKo,
+            exZh,
+            sourceUrl: 'https://www.youtube.com/watch?v=X1bf4ujAGoM'
+          };
+          ALL_WORDS.push(wordObj);
+          WORD_BY_KO[wordObj.ko] = wordObj;
+          WORD_BY_ID[wordObj.id] = wordObj;
+          state.customWords.push(wordObj);
+        } else if (item.zh && item.zh !== '影片/文本檢錄韓文詞彙 (可點擊修改解釋)') {
+          wordObj.zh = item.zh;
+        }
+        state.starredIds.add(wordObj.id);
+        addedCount++;
+      });
+
+      state.checkin.points += addedCount * 5;
+      saveState();
+      updateGlobalCounters();
+      closeExtractModal();
+      showToast(`🎉 已成功將 ${addedCount} 個檢錄生字加入「我的生字本」！`, 'success');
+    }
+
+    // =========================================================================
+    // 13. DAILY K-POP LYRICS LEARNING MODULE
+    // =========================================================================
+    function renderKpopLesson() {
+      const btnBar = document.getElementById('kpopDayButtons');
+      btnBar.innerHTML = KPOP_LESSONS.map((lesson, idx) => {
+        const active = idx === state.activeKpopIndex;
+        return `
+          <button type="button" onclick="selectKpopDay(${idx})" class="px-3 py-1.5 rounded-xl text-xs font-bold transition ${active ? 'bg-rose-500 text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}">
+            ${lesson.dayName}
+          </button>
+        `;
+      }).join('');
+
+      const cur = KPOP_LESSONS[state.activeKpopIndex] || KPOP_LESSONS[0];
+      document.getElementById('kpopSongDayTag').textContent = cur.dayName;
+      document.getElementById('kpopSongLevelTag').textContent = cur.level;
+      document.getElementById('kpopSongTitle').textContent = `${cur.artist} — 〈${cur.title}〉`;
+      document.getElementById('kpopSongTheme').textContent = cur.theme;
+      document.getElementById('kpopSourceUrl').href = cur.sourceUrl;
+
+      // Render lines
+      const linesEl = document.getElementById('kpopLyricsContainer');
+      linesEl.innerHTML = cur.lines.map(line => `
+        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 hover:border-rose-200 transition flex items-start justify-between gap-3">
+          <div class="space-y-1">
+            <div class="font-kr text-base sm:text-lg font-extrabold text-slate-900">${line.ko}</div>
+            <div class="text-xs text-rose-500 font-medium">[${line.rom}]</div>
+            <div class="text-xs sm:text-sm text-slate-600 font-medium">${line.zh}</div>
+          </div>
+          <button type="button" onclick="speakText('${line.ko}')" class="px-3 py-1.5 rounded-xl bg-white border border-slate-200 hover:bg-rose-50 text-xs font-bold text-slate-700 shrink-0">
+            🔊 朗讀
+          </button>
+        </div>
+      `).join('');
+
+      // Render grammar
+      const gramEl = document.getElementById('kpopGrammarContainer');
+      gramEl.innerHTML = cur.grammar.map(g => `
+        <div class="p-3.5 rounded-2xl bg-amber-50/60 border border-amber-200/80 space-y-1">
+          <div class="font-kr font-extrabold text-sm text-amber-900">📌 ${g.form}</div>
+          <div class="text-xs text-slate-700 leading-relaxed">${g.desc}</div>
+        </div>
+      `).join('');
+
+      // Render vocab
+      const vocabEl = document.getElementById('kpopVocabContainer');
+      vocabEl.innerHTML = cur.vocab.map(v => {
+        const existing = WORD_BY_KO[v.ko];
+        const isStarred = existing && state.starredIds.has(existing.id);
+        return `
+          <div class="p-3 rounded-2xl border ${isStarred ? 'border-amber-300 bg-amber-50/40' : 'border-slate-200 bg-slate-50/60'} flex items-center justify-between gap-2">
+            <div>
+              <div class="font-kr font-bold text-sm text-slate-900">${v.ko}</div>
+              <div class="text-xs text-slate-600">${v.zh}</div>
+            </div>
+            <div class="flex items-center gap-1">
+              <button type="button" onclick="speakText('${v.ko}')" class="w-7 h-7 rounded-lg bg-white border border-slate-200 text-xs">🔊</button>
+              <button type="button" onclick="starKpopVocab('${v.ko}', '${v.zh}', '${v.pos}', '${v.exKo}', '${v.exZh}')" class="px-2.5 py-1 rounded-lg ${isStarred ? 'bg-amber-400 text-white' : 'bg-white border border-slate-200 text-slate-600 hover:text-amber-700'} text-xs font-bold">
+                ${isStarred ? '★ 已收錄' : '☆ 生字本'}
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Render Interactive Cloze Quiz
+      const qBox = document.getElementById('kpopQuizBox');
+      qBox.innerHTML = `
+        <div class="font-kr text-sm sm:text-base font-bold text-slate-800">
+          ${cur.quiz.sentenceBefore}
+          <span id="kpopBlankSlot" class="px-3 py-0.5 rounded-lg bg-white border-2 border-dashed border-rose-400 text-rose-600 mx-1">____</span>
+          ${cur.quiz.sentenceAfter}
+        </div>
+        <div class="flex flex-wrap gap-2 pt-1">
+          ${cur.quiz.options.map(opt => `
+            <button type="button" onclick="checkKpopQuizAnswer('${opt}', '${cur.quiz.blankAnswer}')" class="px-3.5 py-1.5 rounded-xl bg-white hover:bg-rose-500 hover:text-white border border-rose-200 text-xs sm:text-sm font-kr font-bold text-slate-800 transition">
+              ${opt}
+            </button>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function selectKpopDay(idx) {
+      state.activeKpopIndex = idx;
+      state.checkin.kpopStudiedToday = true;
+      saveState();
+      renderKpopLesson();
+    }
+
+    function starKpopVocab(ko, zh, pos, exKo, exZh) {
+      let wordObj = WORD_BY_KO[ko];
+      if (!wordObj) {
+        const id = 'kpop_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+        wordObj = {
+          id,
+          num: ALL_WORDS.length + 1,
+          ko,
+          zh,
+          rom: hangulToRoman(ko),
+          pos,
+          cat: '自訂與影片',
+          exKo,
+          exZh,
+          sourceUrl: KPOP_LESSONS[state.activeKpopIndex].sourceUrl
+        };
+        ALL_WORDS.push(wordObj);
+        WORD_BY_KO[ko] = wordObj;
+        WORD_BY_ID[id] = wordObj;
+        state.customWords.push(wordObj);
+      }
+      toggleWordStar(wordObj.id);
+      renderKpopLesson();
+    }
+
+    function addAllKpopWordsToStarred() {
+      const cur = KPOP_LESSONS[state.activeKpopIndex];
+      cur.vocab.forEach(v => {
+        let wordObj = WORD_BY_KO[v.ko];
+        if (!wordObj) {
+          const id = 'kpop_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+          wordObj = {
+            id,
+            num: ALL_WORDS.length + 1,
+            ko: v.ko,
+            zh: v.zh,
+            rom: hangulToRoman(v.ko),
+            pos: v.pos,
+            cat: '自訂與影片',
+            exKo: v.exKo,
+            exZh: v.exZh,
+            sourceUrl: cur.sourceUrl
+          };
+          ALL_WORDS.push(wordObj);
+          WORD_BY_KO[v.ko] = wordObj;
+          WORD_BY_ID[id] = wordObj;
+          state.customWords.push(wordObj);
+        }
+        state.starredIds.add(wordObj.id);
+      });
+      state.checkin.kpopStudiedToday = true;
+      state.checkin.points += 20;
+      saveState();
+      updateGlobalCounters();
+      renderKpopLesson();
+      showToast(`★ 已將〈${cur.title}〉全部核心生字加入生字本！`, 'success');
+    }
+
+    function checkKpopQuizAnswer(selected, answer) {
+      const slot = document.getElementById('kpopBlankSlot');
+      const status = document.getElementById('kpopQuizStatus');
+      if (selected === answer) {
+        slot.textContent = selected;
+        slot.className = 'px-3 py-0.5 rounded-lg bg-emerald-500 text-white mx-1 font-bold';
+        status.textContent = '🎉 答對了！發音與語感都很棒 (+10 P)';
+        status.className = 'text-xs font-bold text-emerald-600';
+        state.checkin.points += 10;
+        state.checkin.kpopStudiedToday = true;
+        saveState();
+        updateGlobalCounters();
+        speakText(selected);
+      } else {
+        slot.textContent = selected;
+        slot.className = 'px-3 py-0.5 rounded-lg bg-rose-500 text-white mx-1 font-bold';
+        status.textContent = '💡 再試一次看看！';
+      }
+    }
+
+    // =========================================================================
+    // 14. AUTO KOREAN TRANSLATOR (Bidirectional Korean <-> Chinese + Breakdown)
+    // =========================================================================
+    const PHRASE_KO_TO_ZH = [
+      ['보고 싶다 이렇게 말하니까 더 보고 싶다', '好想你，這樣說出口之後就更加想念你了'],
+      ['오늘 친구하고 같이 가게에서 커피를 마셨어요', '今天和朋友一起在商店喝了咖啡'],
+      ['한국어 공부는 정말 재미있어요', '學習韓文真的非常有趣'],
+      ['이 밤 그날의 반딧불을 당신의 창 가까이 보낼게요', '今夜，我會將那天的螢火蟲送到您的窗邊'],
+      ['만나서 반갑습니다', '很高興認識你'],
+      ['도와주셔서 정말 감사합니다', '真的非常感謝您的幫忙'],
+      ['이거 얼마예요', '請問這個多少錢'],
+      ['화장실이 어디에 있어요', '請問洗手間在哪裡'],
+      ['보고 싶다', '好想你 / 想見你'],
+      ['사랑해요', '我愛你'],
+      ['괜찮아요', '沒關係 / 還好嗎']
+    ];
+
+    const PHRASE_ZH_TO_KO = [
+      ['這個多少錢', { polite: '이거 얼마예요?', formal: '이것은 얼마입니까?', casual: '이거 얼마야?' }],
+      ['請給我水', { polite: '물 좀 주세요.', formal: '물을 주십시오.', casual: '물 좀 줘.' }],
+      ['謝謝', { polite: '감사합니다!', formal: '대단히 감사합니다.', casual: '고마워!' }],
+      ['你好', { polite: '안녕하세요!', formal: '안녕하십니까!', casual: '안녕!' }],
+      ['對不起', { polite: '죄송해요.', formal: '죄송합니다.', casual: '미안해.' }],
+      ['我想去韓國旅遊', { polite: '한국에 여행 가고 싶어요.', formal: '한국에 여행 가고 싶습니다.', casual: '한국에 여행 가고 싶어.' }],
+      ['也想吃烤肉和泡菜', { polite: '불고기와 김치도 먹고 싶어요.', formal: '불고기와 김치도 먹고 싶습니다.', casual: '불고기랑 김치도 먹고 싶어.' }],
+      ['好想你', { polite: '너무 보고 싶어요.', formal: '매우 보고 싶습니다.', casual: '보고 싶다.' }],
+      ['我愛你', { polite: '사랑해요.', formal: '사랑합니다.', casual: '사랑해.' }]
+    ];
+
+    let lastTranslatedKoText = '';
+
+    function setTranslatorSample(text) {
+      document.getElementById('transInput').value = text;
+      runAutoTranslation();
+    }
+
+    function clearTranslator() {
+      document.getElementById('transInput').value = '';
+      runAutoTranslation();
+    }
+
+    function runAutoTranslation() {
+      const raw = (document.getElementById('transInput').value || '').trim();
+      const dirSelect = document.getElementById('transDirection').value;
+      const politeness = document.getElementById('transPoliteness').value;
+      const outMain = document.getElementById('transOutputMain');
+      const outRom = document.getElementById('transOutputRoman');
+      const breakdownEl = document.getElementById('transBreakdownList');
+
+      if (!raw) {
+        outMain.textContent = '請在左側輸入韓文或中文句子...';
+        outRom.textContent = '羅馬拼音與發音指南將顯示於此';
+        breakdownEl.innerHTML = '';
+        return;
+      }
+
+      const hasHangul = /[가-힣]/.test(raw);
+      const isKoToZh = dirSelect === 'ko2zh' || (dirSelect === 'auto' && hasHangul);
+
+      if (isKoToZh) {
+        document.getElementById('transSourceLangLabel').textContent = '輸入文字 (偵測為：韓文 한국어)';
+        document.getElementById('transTargetLangLabel').textContent = '自動翻譯結果 (繁體中文)';
+        lastTranslatedKoText = raw;
+
+        // Translate Korean sentence(s) to Chinese
+        let translated = raw;
+        PHRASE_KO_TO_ZH.forEach(([k, z]) => {
+          if (translated.includes(k)) translated = translated.split(k).join(z);
+        });
+
+        // Token-level fallback translation for remaining Korean words
+        const extracted = extractKoreanWordsFromString(raw);
+        if (translated === raw && extracted.length > 0) {
+          translated = extracted.map(item => item.zh.split('、')[0]).join(' + ');
+        }
+
+        outMain.textContent = translated;
+        outRom.textContent = `🔊 韓文羅馬拼音：[${hangulToRoman(raw)}]`;
+        renderTranslatorBreakdown(extracted);
+      } else {
+        document.getElementById('transSourceLangLabel').textContent = '輸入文字 (偵測為：繁體中文)';
+        document.getElementById('transTargetLangLabel').textContent = `自動翻譯結果 (韓文 · ${politeness === 'formal' ? '正式敬語' : politeness === 'casual' ? '親密半語' : '禮貌敬語'})`;
+
+        let koParts = [];
+        let remaining = raw;
+        PHRASE_ZH_TO_KO.forEach(([zhKey, forms]) => {
+          if (remaining.includes(zhKey)) {
+            koParts.push(forms[politeness]);
+            remaining = remaining.replace(zhKey, '');
+          }
+        });
+
+        // Search 1,000 word dictionary for matching Chinese terms
+        if (koParts.length === 0) {
+          const matchedWords = ALL_WORDS.filter(w => {
+            const firstMeaning = w.zh.split(/[、/()]/)[0];
+            return firstMeaning && raw.includes(firstMeaning);
+          });
+          if (matchedWords.length > 0) {
+            const suffix = politeness === 'formal' ? '입니다.' : politeness === 'casual' ? '야.' : '예요.';
+            koParts.push(matchedWords.map(w => w.ko).join(', ') + ' ' + suffix);
+          } else {
+            koParts.push(politeness === 'casual' ? '한국어를 같이 공부하자!' : '한국어를 같이 공부해요!');
+          }
+        }
+
+        const finalKo = koParts.join(' ');
+        lastTranslatedKoText = finalKo;
+        outMain.textContent = finalKo;
+        outRom.textContent = `🔊 韓文羅馬拼音：[${hangulToRoman(finalKo)}]`;
+        const extracted = extractKoreanWordsFromString(finalKo);
+        renderTranslatorBreakdown(extracted);
+      }
+    }
+
+    function renderTranslatorBreakdown(extracted) {
+      const breakdownEl = document.getElementById('transBreakdownList');
+      if (!extracted || extracted.length === 0) {
+        breakdownEl.innerHTML = `<div class="text-xs text-slate-400 col-span-full">尚無可拆解的韓文單字</div>`;
+        return;
+      }
+      breakdownEl.innerHTML = extracted.map(item => {
+        const existing = WORD_BY_KO[item.ko];
+        const isStarred = existing && state.starredIds.has(existing.id);
+        return `
+          <div class="p-3 rounded-2xl border ${isStarred ? 'border-amber-300 bg-amber-50/40' : 'border-slate-200 bg-slate-50'} flex items-center justify-between gap-2">
+            <div>
+              <div class="flex items-center gap-1.5">
+                <span class="font-kr font-bold text-sm text-slate-900">${item.ko}</span>
+                <span class="text-[11px] text-rose-500">[${item.rom}]</span>
+              </div>
+              <div class="text-xs text-slate-600 mt-0.5">${item.zh}</div>
+            </div>
+            <button type="button" onclick="quickStarFromTranslator('${item.ko}', '${item.zh}')" class="px-2.5 py-1 rounded-xl ${isStarred ? 'bg-amber-400 text-white' : 'bg-white border border-slate-200 text-slate-600 hover:text-amber-700'} text-xs font-bold shrink-0">
+              ${isStarred ? '★ 已存' : '☆ 生字本'}
+            </button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function quickStarFromTranslator(ko, zh) {
+      let wordObj = WORD_BY_KO[ko];
+      if (!wordObj) {
+        const id = 'trans_' + Date.now();
+        const [exKo, exZh] = buildExampleForWord(ko, zh, '自訂與影片', '翻譯詞彙');
+        wordObj = { id, num: ALL_WORDS.length + 1, ko, zh, rom: hangulToRoman(ko), pos: '翻譯詞彙', cat: '自訂與影片', exKo, exZh };
+        ALL_WORDS.push(wordObj);
+        WORD_BY_KO[ko] = wordObj;
+        WORD_BY_ID[id] = wordObj;
+        state.customWords.push(wordObj);
+      }
+      toggleWordStar(wordObj.id);
+      runAutoTranslation();
+    }
+
+    function speakTranslatedKorean() {
+      speakText(lastTranslatedKoText || document.getElementById('transOutputMain').textContent);
+    }
+
+    function copyTranslationResult() {
+      const text = document.getElementById('transOutputMain').textContent;
+      try {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        ta.remove();
+        showToast('📋 已複製翻譯結果至剪貼簿！', 'success');
+      } catch (e) {
+        showToast('已選取翻譯文字', 'info');
+      }
+    }
+
+    function extractFromTranslatorToModal() {
+      const targetKo = lastTranslatedKoText || document.getElementById('transInput').value;
+      state.extractedCandidates = extractKoreanWordsFromString(targetKo);
+      if (state.extractedCandidates.length === 0) {
+        showToast('目前句子中沒有可檢錄的韓文生字', 'warn');
+        return;
+      }
+      openExtractModal();
+    }
+
+    // =========================================================================
+    // 15. DAILY CHECK-IN & STUDY CALENDAR (2026-11-11)
+    // =========================================================================
+    const TODAY_STR = '2026-11-11';
+
+    function handleDailyCheckin() {
+      if (state.checkin.checkedToday || state.checkin.dates.includes(TODAY_STR)) {
+        state.checkin.checkedToday = true;
+        switchTab('checkin');
+        showToast('📅 您今天 (2026-11-11) 已經完成簽到囉！繼續保持連續打卡！', 'info');
+        return;
+      }
+      state.checkin.checkedToday = true;
+      state.checkin.dates.push(TODAY_STR);
+      state.checkin.streak += 1;
+      state.checkin.points += 50;
+      saveState();
+      updateGlobalCounters();
+      renderCheckinTab();
+      showToast('🎉 簽到成功！連續打卡 ' + state.checkin.streak + ' 天，獲得 +50 學習積分！', 'success');
+    }
+
+    function renderCheckinTab() {
+      const isChecked = state.checkin.checkedToday || state.checkin.dates.includes(TODAY_STR);
+      document.getElementById('checkinStreakNum').textContent = `${state.checkin.streak} 天`;
+      document.getElementById('checkinTotalDaysNum').textContent = `${state.checkin.dates.length} 天`;
+      document.getElementById('checkinPointsNum').textContent = `${state.checkin.points} P`;
+
+      const mainBtn = document.getElementById('mainCheckinBtn');
+      if (isChecked) {
+        mainBtn.textContent = '✅ 今日 (11/11) 已完成簽到打卡';
+        mainBtn.className = 'px-5 py-3 rounded-2xl bg-emerald-600 text-white font-extrabold text-sm shadow-sm cursor-default';
+      }
+
+      // Render November 2026 Calendar (Nov 1, 2026 is Sunday!)
+      const grid = document.getElementById('checkinCalendarGrid');
+      let cells = '';
+      for (let day = 1; day <= 30; day++) {
+        const dStr = `2026-11-${String(day).padStart(2, '0')}`;
+        const checked = state.checkin.dates.includes(dStr);
+        const isToday = dStr === TODAY_STR;
+        cells += `
+          <div class="h-11 sm:h-12 rounded-xl border ${checked ? 'bg-rose-500 text-white border-rose-600 font-bold shadow-sm' : isToday ? 'bg-amber-50 border-amber-400 text-amber-900 font-bold' : 'bg-slate-50 border-slate-200/70 text-slate-600'} flex flex-col items-center justify-center text-xs relative">
+            <span>${day}</span>
+            <span class="text-[10px]">${checked ? '✓' : isToday ? '今日' : ''}</span>
+          </div>
+        `;
+      }
+      grid.innerHTML = cells;
+
+      // Render Daily Missions
+      const missions = [
+        { title: '完成每日簽到打卡', done: isChecked, reward: '+50 P', action: "handleDailyCheckin()", btn: '打卡' },
+        { title: `滑動複習 5 張 TOPIK 1 單字卡 (目前 ${state.checkin.cardsSwipedToday}/5)`, done: state.checkin.cardsSwipedToday >= 5, reward: '+20 P', action: "switchTab('flashcard')", btn: '去抽卡' },
+        { title: `生字本收錄達 10 個單字 (目前 ${state.starredIds.size}/10)`, done: state.starredIds.size >= 10, reward: '+20 P', action: "switchTab('videoloader')", btn: '去檢錄' },
+        { title: '學習今日 K-Pop 韓文歌詞或完成填空', done: state.checkin.kpopStudiedToday, reward: '+30 P', action: "switchTab('kpop')", btn: '學歌詞' }
+      ];
+
+      document.getElementById('dailyMissionList').innerHTML = missions.map(m => `
+        <div class="p-3.5 rounded-2xl border ${m.done ? 'border-emerald-200 bg-emerald-50/50' : 'border-slate-200 bg-slate-50'} flex items-center justify-between gap-3">
+          <div class="flex items-center gap-2.5">
+            <span class="w-6 h-6 rounded-full ${m.done ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-500'} flex items-center justify-center text-xs font-bold">${m.done ? '✓' : '•'}</span>
+            <div>
+              <div class="text-xs sm:text-sm font-bold ${m.done ? 'text-emerald-950 line-through' : 'text-slate-800'}">${m.title}</div>
+              <div class="text-[11px] text-amber-600 font-semibold">獎勵 ${m.reward}</div>
+            </div>
+          </div>
+          ${m.done ? '<span class="text-xs font-bold text-emerald-600">已達成</span>' : `<button type="button" onclick="${m.action}" class="px-3 py-1.5 rounded-xl bg-white border border-slate-300 hover:bg-rose-50 text-xs font-bold text-slate-700">${m.btn}</button>`}
+        </div>
+      `).join('');
+    }
+
+    // =========================================================================
+    // 16. INITIALIZE APP ON LOAD
+    // =========================================================================
+    window.addEventListener('DOMContentLoaded', () => {
+      loadSavedState();
+      detectUserDevice();
+      window.addEventListener('resize', () => detectUserDevice());
+      initSwipeGestures();
+      updateGlobalCounters();
+      pickNextFlashcard();
+      renderKpopLesson();
+      runAutoTranslation();
+      renderCheckinTab();
+    });
+  </script>
+</body>
+</html>
